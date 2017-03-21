@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "symbol_table.h"
+
 #define YYDEBUG 1
 extern int yyerror(char*);
 extern int yylex();
@@ -17,6 +19,8 @@ typedef struct {
     int i;
     char* id;
     nodeType *nPtr;
+    argType *argH;
+    typeEnum tp;
 }
 %token<id> V
 %token<i> I
@@ -28,7 +32,9 @@ typedef struct {
 %left Or And                    
 %left Pl Mo                    
 %left Mu                    
-%right Not     
+%right Not   
+%type<argH> Argt L_argt L_argtnn
+%type<tp> TP T_boo T_int T_ar
 
 %%
 MP: L_vart LD C
@@ -39,11 +45,9 @@ E : E Pl E
   | E Lt E
   | E Eq E
   | E And E 
+  | E Mu E
   | V '(' L_args ')' 
   | Et
-  | T
-
-T : T Mu F
   | F
 
 F: '(' E ')'    
@@ -75,13 +79,13 @@ L_args: %empty
 L_argsnn: E
         | E ',' L_argsnn
 
-L_argt: %empty
-      | L_argtnn
+L_argt: %empty                {$$ = NULL;}
+      | L_argtnn              {$$ = $1;}
 
-L_argtnn: Argt
-        | L_argtnn ',' Argt
+L_argtnn: Argt                {$$ = $1;}
+        | L_argtnn ',' Argt   {$$ = addArg($1,$3);}
 
-Argt: V ':' TP
+Argt: V ':' TP                {$$ = arg($1,$3);}
 
 TP: T_boo
   | T_int

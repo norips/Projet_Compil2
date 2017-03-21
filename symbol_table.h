@@ -3,7 +3,7 @@
 #include "uthash.h"
 #define SYMBOL_TABLE_H
 #define MAX_SIZE_ID 256
-typedef enum { typeVar, typeFun, typePro } symEnum;
+typedef enum { typeVar, typeFun, typePro, typeArr } symEnum;
 typedef enum {integer, boolean} typeEnum;
 /* constants */
 typedef struct {
@@ -42,7 +42,7 @@ symbolTag* fun(symbolTag** hash,char *id,typeEnum type, argType* args);
 
 argType* arg(char *name, typeEnum type);
 
-argType* addArg(argType *parent,char *name, typeEnum type);
+argType* addArg(argType *parent, argType *arg);
 
 symbolTag* var(symbolTag** hash,char *id, typeEnum type);
 

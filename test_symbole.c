@@ -7,7 +7,8 @@ symbolTag* h_table = NULL;
 int main(int argc, char** argv) {
     
     argType *head = arg("arg1",integer);
-    addArg(addArg(head,"arg2",integer),"arg3",boolean);
+    addArg(head,arg("arg2",integer));
+    addArg(head,arg("arg2",boolean));
     fun(&h_table,"foobar",integer,head);
     var(&h_table,"barfoo",boolean);
 

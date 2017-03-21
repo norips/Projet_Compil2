@@ -29,13 +29,13 @@ argType* arg(char *name, typeEnum type) {
     return a;
 
 }
-argType* addArg(argType *parent,char *name, typeEnum type) {
-    argType* a = malloc(sizeof(argType));
-    strncpy(a->name, name,MAX_SIZE_ID);
-    a->type = type;
-    a->next = NULL;
-    parent->next = a;
-    return a;
+argType* addArg(argType *head,argType *arg) {
+    arg->next = NULL;
+    while(head->next != NULL) {
+        head = head->next;
+    }
+    head->next = arg;
+    return head;
 }
 symbolTag* var(symbolTag** hash,char *id, typeEnum type) {
     symbolTag* s = malloc(sizeof(symbolTag));
