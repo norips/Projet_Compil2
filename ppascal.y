@@ -62,7 +62,7 @@ C0 : Et Af E
   | V Af E
   | Sk
   | '{' C '}'
-  | If E Th C El C0 
+  | If E Th C0 El C0
   | Wh E Do C0
   | V '(' L_args ')'
 
