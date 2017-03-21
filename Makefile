@@ -10,7 +10,7 @@ ppascal: ppascal.tab.c ppascal.yy.c utils/symbol_table.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 ppascal.tab.c ppascal.tab.h: ppascal.y
-	bison -t -v -d ppascal.y -o $@
+	bison --debug -t -v -d ppascal.y -o $@
 
 ppascal.yy.c: ppascal.l ppascal.tab.h
 	flex -o $@ $< 
