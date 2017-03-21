@@ -4,17 +4,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "symbol_table.h"
+
+#include "utils/symbol_table.h"
+#include "utils/AST.h"
 
 #define YYDEBUG 1
-extern int yyerror(char*);
 extern int yylex();
-extern int ex(ENV *e,nodeType *p);
-typedef struct {
-    int id;
-  } nodeType;
+
 
 %}
+
 %union {
     int i;
     char* id;
@@ -36,48 +35,50 @@ typedef struct {
 %type<argH> Argt L_argt L_argtnn
 %type<tp> TP T_boo T_int T_ar
 
+%type<nPtr> L_args L_argsnn E F C C0 Et
+
 %%
 MP: L_vart LD C
 
-E : E Pl E
-  | E Mo E
-  | E Or E
-  | E Lt E
-  | E Eq E
-  | E And E 
-  | E Mu E
-  | V '(' L_args ')' 
+E : E Pl E                    {$$;}
+  | E Mo E                    {$$;}
+  | E Or E                    {$$;}
+  | E Lt E                    {$$;}
+  | E Eq E                    {$$;}
+  | E And E                   {$$;}
+  | E Mu E                    {$$;}
+  | V '(' L_args ')'          {$$;}
   | Et
   | F
 
-F: '(' E ')'    
- | I      
- | Mo I     
- | V   
- | true
- | false   
- | NewAr TP '[' E ']' 
+F: '(' E ')'                  {$$;}
+ | I                          {$$;}
+ | Mo I                       {$$;}
+ | V                          {$$;}
+ | true                       {$$;}
+ | false                      {$$;}
+ | NewAr TP '[' E ']'         {$$;}
  ;
 
-Et: V '[' E ']'
-  | Et '[' E ']'
+Et: V '[' E ']'               {$$;}
+  | Et '[' E ']'              {$$;}
 
-C0 : Et Af E
-  | V Af E
-  | Sk
-  | '{' C '}'
-  | If E Th C0 El C0
-  | Wh E Do C0
-  | V '(' L_args ')'
+C0 : Et Af E                  {$$;}
+  | V Af E                    {$$;}
+  | Sk                        {$$;}
+  | '{' C '}'                 {$$;}
+  | If E Th C0 El C0          {$$;}
+  | Wh E Do C0                {$$;}
+  | V '(' L_args ')'          {$$;}
 
-C: C Se C0
- | C0
+C: C Se C0                    {$$;}
+ | C0                         {$$;}
 
-L_args: %empty
-      | L_argsnn
+L_args: %empty                {$$ = NULL;}
+      | L_argsnn              {$$ = $1;}
 
-L_argsnn: E
-        | E ',' L_argsnn
+L_argsnn: E                   {$$ = $1;}
+        | E ',' L_argsnn      {}
 
 L_argt: %empty                {$$ = NULL;}
       | L_argtnn              {$$ = $1;}
@@ -120,6 +121,6 @@ int yywrap() {
 }
 
 int main(int argn, char **argv) {
-    yydebug = 0;
+    yydebug = 1;
     return yyparse();
 }
