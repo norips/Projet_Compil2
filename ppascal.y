@@ -7,8 +7,13 @@
 
 #include "utils/symbol_table.h"
 #include "utils/AST.h"
+#include "utils/enum.h"
 
 #define YYDEBUG 1
+
+symbolTag* h_table = NULL;
+
+
 extern int yylex();
 
 
@@ -21,10 +26,12 @@ extern int yylex();
     argType *argH;
     typeEnum tp;
 }
-%token<id> V
+%token<id> V NFon NPro
 %token<i> I
-//%type <nPtr> C E
-%token T_ar NFon NPro NewAr T_boo T_int Def Dep Af true false Sk Se If Th El Var Wh Do
+
+%type<id> D_entf D_entp 
+
+%token T_ar NewAr T_boo T_int Def Dep Af true false Sk Se If Th El Var Wh Do
 %token Eq Lt
 %token Not And Or Pl Mo Mu
 %nonassoc Eq Lt
@@ -32,7 +39,7 @@ extern int yylex();
 %left Pl Mo                    
 %left Mu                    
 %right Not   
-%type<argH> Argt L_argt L_argtnn
+%type<argH> Argt L_argt L_argtnn L_vart L_vartnn
 %type<tp> TP T_boo T_int T_ar
 
 %type<nPtr> L_args L_argsnn E F C C0 Et
@@ -52,18 +59,18 @@ E : E Pl E                    {$$ = opr(Pl,2,$1, $3);}
   | F                         {$$ = $1;}
 
 F: '(' E ')'                  {$$ = $2;}
- | I                          {$$ = con($1);}
- | Mo I                       {$$ = con(-$2);}
+ | I                          {$$ = con($1,integer);}
+ | Mo I                       {$$ = con(-$2,integer);}
  | V                          {$$ = id($1);}
- | true                       {$$ = con(1);}
- | false                      {$$ = con(0);}
+ | true                       {$$ = con(1,boolean);}
+ | false                      {$$ = con(0,boolean);}
  | NewAr TP '[' E ']'         {$$;}
  ;
 
 Et: V '[' E ']'               {$$;}
   | Et '[' E ']'              {$$;}
 
-C0 : Et Af E                  {$$ = opr(Af,2,id($1), $3);}
+C0 : Et Af E                  {/*$$ = opr(Af,2,id($1), $3);*/ $$;}
   | V Af E                    {$$ = opr(Af,2,id($1), $3);}
   | Sk                        {$$ = opr(Sk,2,NULL,NULL);}
   | '{' C '}'                 {$$ = $2;}
@@ -76,8 +83,8 @@ C: C Se C0                    {$$ = opr(Se,2,$1,$3);}
 L_args: %empty                {$$ = NULL;}
       | L_argsnn              {$$ = $1;}
 
-L_argsnn: E                   {$$ = $1;}
-        | E ',' L_argsnn      {}
+L_argsnn: E                   {$$ = opr(L,2,$1,NULL);}
+        | E ',' L_argsnn      {$$ = opr(L,2,$1,$3);}
 
 L_argt: %empty                {$$ = NULL;}
       | L_argtnn              {$$ = $1;}
@@ -93,21 +100,21 @@ TP: T_boo                     {$$ = boolean;}
                                 else if($2 == integer) $$ = arrInt;
                               }
 
-L_vart: %empty
-      | L_vartnn
+L_vart: %empty                      {$$ = NULL;}
+      | L_vartnn                    {$$ = $1;}
 
-L_vartnn: Var Argt
-        | L_vartnn ',' Var Argt
+L_vartnn: Var Argt                  {$$ = $2;}
+        | L_vartnn ',' Var Argt     {$$ = addArg($1,$4);}
 
-D_entp: Dep NPro '(' L_argt ')'
+D_entp: Dep NPro '(' L_argt ')'             {$$ = $2; fun(&h_table,$2,typeNone,$4);}
 
-D_entf: Def NFon '(' L_argt ')' ':' TP
+D_entf: Def NFon '(' L_argt ')' ':' TP      {$$ = $2; fun(&h_table,$2,$7,$4); }
 
-D: D_entp L_vart C
- | D_entf L_vart C
+D: D_entp L_vart C                          {symbolTag *f = getID(&h_table,$1); if(f->type != typeFun) {yyerror("Identifier already declared");} f->_fun.local = $2; f->_fun.corps = $3;}
+ | D_entf L_vart C                          {symbolTag *f = getID(&h_table,$1); if(f->type != typeFun) {yyerror("Identifier already declared");} f->_fun.local = $2; f->_fun.corps = $3;}
 
-LD: %empty
-  | LD D
+LD: %empty                                  
+  | LD D                                   
 
 %%
 

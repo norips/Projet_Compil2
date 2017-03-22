@@ -3,6 +3,7 @@
 
 #include "uthash.h"
 #include "symbol_table.h"
+#include "enum.h"
 
 
 symbolTag* getID(symbolTag** hash,char *id) {
@@ -17,7 +18,7 @@ symbolTag* fun(symbolTag** hash,char *id ,typeEnum type ,argType* args) {
     symbolTag* s = malloc(sizeof(symbolTag));
     strncpy(s->name, id,MAX_SIZE_ID);
     s->type = typeFun;
-    s->_fun.head = args;
+    s->_fun.args = args;
     HASH_ADD_STR( *hash, name, s );
     return s;
 }
@@ -32,9 +33,9 @@ argType* arg(char *name, typeEnum type) {
 argType* addArg(argType *head,argType *arg) {
     arg->next = NULL;
     while(head->next != NULL) {
-        head = head->next;
+        head = (argType*) head->next;
     }
-    head->next = arg;
+    head->next = (struct argType*) arg;
     return head;
 }
 symbolTag* var(symbolTag** hash,char *id, typeEnum type) {
@@ -53,10 +54,10 @@ void print_table(symbolTag** hash) {
             printf("Var : %s, type : %s\n",s->name,s->_var.type == integer ? "Integer" : "Boolean");
         } else if(s->type == typeFun) {
             printf("Fun : %s, type : %s,[",s->name,s->_fun.type == integer ? "Integer" : "Boolean");
-            argType *a = s->_fun.head;
+            argType *a = s->_fun.args;
             while(a!=NULL) {
                 printf("(%s,%s),",a->name,a->type == integer ? "Integer" : "Boolean");
-                a=a->next;
+                a=(argType*)a->next;
             }
             printf("]\n");
         }

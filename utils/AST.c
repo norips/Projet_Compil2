@@ -3,8 +3,8 @@
 #include <stdarg.h>
 #include <string.h>
 #include "AST.h"
-
-nodeType *con(int value) {
+#include "enum.h"
+nodeType *con(int value, typeEnum type) {
     nodeType *p;
 
     /* allocate node */
@@ -13,6 +13,7 @@ nodeType *con(int value) {
 
     /* copy information */
     p->type = typeCon;
+    p->con.type = type;
     p->con.value = value;
 
     return p;

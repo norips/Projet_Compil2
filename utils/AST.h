@@ -1,11 +1,12 @@
 #ifndef AST_H
 #define AST_H 
+#include "enum.h"
 extern int yyerror(char *s);
-typedef enum { typeCon, typeId, typeOpr } nodeEnum;
 
 /* constants */
 typedef struct {
     int value;                  /* value of constant */
+    typeEnum type;
 } conNodeType;
 
 /* identifiers */
@@ -34,7 +35,7 @@ extern char* sym[100];
 
 nodeType *opr(int oper, int nops, ...);
 nodeType *id(char *id);
-nodeType *con(int value);
+nodeType *con(int value,typeEnum type);
 void freeNode(nodeType *p);
 #endif
 

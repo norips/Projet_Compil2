@@ -5,7 +5,7 @@
 #include "utils/symbol_table.h"
 #include "ppascal.tab.h"
 %}
-
+%option noinput nounput
 %%
 [0-9]+  {yylval.i = atoi(yytext);return I;}
 boolean  {return T_boo;}

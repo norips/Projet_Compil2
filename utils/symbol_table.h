@@ -1,12 +1,11 @@
 #ifndef SYMBOL_TABLE_H
+#define SYMBOL_TABLE_H
+
 
 #include "uthash.h"
+#include "enum.h"
 #include "AST.h"
-#define SYMBOL_TABLE_H
 #define MAX_SIZE_ID 256
-#define Fun 800
-typedef enum { typeVar, typeFun, typePro, typeArr } symEnum;
-typedef enum {integer, boolean, arrInt, arrBool} typeEnum;
 /* constants */
 typedef struct {
     int type;                  /* type of var */
@@ -14,7 +13,7 @@ typedef struct {
 
 
 typedef struct {
-    int type;
+    typeEnum type;
     char name[MAX_SIZE_ID];
     struct argType* next;
 } argType;
@@ -22,7 +21,8 @@ typedef struct {
 /* identifiers */
 typedef struct {
     int type;
-    argType *head ;                      /* subscript to sym array */
+    argType *args ;                      /* subscript to sym array */
+    argType *local ;                      /* subscript to sym array */
     nodeType *corps;
 } funType;
 
