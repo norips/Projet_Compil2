@@ -40,39 +40,38 @@ extern int yylex();
 %%
 MP: L_vart LD C
 
-E : E Pl E                    {$$;}
-  | E Mo E                    {$$;}
-  | E Or E                    {$$;}
-  | E Lt E                    {$$;}
-  | E Eq E                    {$$;}
-  | E And E                   {$$;}
-  | E Mu E                    {$$;}
-  | V '(' L_args ')'          {$$;}
-  | Et
-  | F
+E : E Pl E                    {$$ = opr(Pl,2,$1, $3);}
+  | E Mo E                    {$$ = opr(Mo,2,$1, $3);}
+  | E Or E                    {$$ = opr(Or,2,$1, $3);}
+  | E Lt E                    {$$ = opr(Lt,2,$1, $3);}
+  | E Eq E                    {$$ = opr(Eq,2,$1, $3);}
+  | E And E                   {$$ = opr(And,2,$1, $3);}
+  | E Mu E                    {$$ = opr(Mu,2,$1, $3);}
+  | V '(' L_args ')'          {$$ = opr(Fun,2,$1, $3);}
+  | Et                        {$$ = $1;}
+  | F                         {$$ = $1;}
 
-F: '(' E ')'                  {$$;}
- | I                          {$$;}
- | Mo I                       {$$;}
- | V                          {$$;}
- | true                       {$$;}
- | false                      {$$;}
+F: '(' E ')'                  {$$ = $2;}
+ | I                          {$$ = con($1);}
+ | Mo I                       {$$ = con(-$2);}
+ | V                          {$$ = id($1);}
+ | true                       {$$ = con(1);}
+ | false                      {$$ = con(0);}
  | NewAr TP '[' E ']'         {$$;}
  ;
 
 Et: V '[' E ']'               {$$;}
   | Et '[' E ']'              {$$;}
 
-C0 : Et Af E                  {$$;}
-  | V Af E                    {$$;}
-  | Sk                        {$$;}
-  | '{' C '}'                 {$$;}
-  | If E Th C0 El C0          {$$;}
-  | Wh E Do C0                {$$;}
-  | V '(' L_args ')'          {$$;}
+C0 : Et Af E                  {$$ = opr(Af,2,id($1), $3);}
+  | V Af E                    {$$ = opr(Af,2,id($1), $3);}
+  | Sk                        {$$ = opr(Sk,2,NULL,NULL);}
+  | '{' C '}'                 {$$ = $2;}
+  | If E Th C0 El C0          {$$ = opr(If,3,$2,$4,$6);}
+  | Wh E Do C0                {$$ = opr(Wh,2,$2,$4);}
 
-C: C Se C0                    {$$;}
- | C0                         {$$;}
+C: C Se C0                    {$$ = opr(Se,2,$1,$3);}
+ | C0                         {$$ = $1;}
 
 L_args: %empty                {$$ = NULL;}
       | L_argsnn              {$$ = $1;}
@@ -88,9 +87,11 @@ L_argtnn: Argt                {$$ = $1;}
 
 Argt: V ':' TP                {$$ = arg($1,$3);}
 
-TP: T_boo
-  | T_int
-  | T_ar TP
+TP: T_boo                     {$$ = boolean;}
+  | T_int                     {$$ = integer;}
+  | T_ar TP                   {if($2 == boolean) $$ = arrBool;
+                                else if($2 == integer) $$ = arrInt;
+                              }
 
 L_vart: %empty
       | L_vartnn

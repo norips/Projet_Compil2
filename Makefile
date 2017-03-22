@@ -6,7 +6,9 @@ OBJS= test_symbole ppascal
 
 all : $(OBJS)
 
-ppascal: ppascal.tab.c ppascal.yy.c utils/symbol_table.o
+utils/AST.o : utils/AST.c utils/AST.h
+
+ppascal: ppascal.tab.c ppascal.yy.c utils/symbol_table.o utils/AST.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 ppascal.tab.c ppascal.tab.h: ppascal.y
