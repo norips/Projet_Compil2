@@ -19,6 +19,7 @@ symbolTag* fun(symbolTag** hash,char *id ,typeEnum type ,argType* args) {
     strncpy(s->name, id,MAX_SIZE_ID);
     s->type = typeFun;
     s->_fun.args = args;
+    s->_fun.type = type;
     HASH_ADD_STR( *hash, name, s );
     return s;
 }

@@ -20,7 +20,7 @@ typedef struct {
 
 /* identifiers */
 typedef struct {
-    int type;
+    typeEnum type;
     argType *args ;                      /* subscript to sym array */
     argType *local ;                      /* subscript to sym array */
     nodeType *corps;

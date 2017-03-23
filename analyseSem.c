@@ -3,9 +3,11 @@
 #include "utils/AST.h"
 #include "ppascal.tab.h"
 #include "utils/uthash.h"
+#include "utils/tools.h"
 
 
 int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
+	int typeL = -1, typeR = -1;
 	switch(C->type) {
 		case typeCon:
 			return C->con.type;
@@ -19,25 +21,42 @@ int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 					exit(-1);
 				}
 			}
+			return var->_var.type;
 
 			break;
 		case typeOpr:
 			switch(C->opr.oper) {
 				case Af:
-					analyseSem(glob,loc,C->opr.op[0]);
-					analyseSem(glob,loc,C->opr.op[1]);
+					if((typeL = analyseSem(glob,loc,C->opr.op[0])) != (typeR = analyseSem(glob,loc,C->opr.op[1]))) {
+						fprintf(stderr, "Type mismatch on affectation %s\n",C->opr.op[0]->id.id);
+						exit(-1);
+					}
+					
+					return typeL;
 					break;
+				case Mo:
+				case Mu:
+				case Or:
+				case Lt:
+				case Eq:
+				case And:
 				case Pl:
-					analyseSem(glob,loc,C->opr.op[0]);
-					analyseSem(glob,loc,C->opr.op[1]);
+					if((typeL = analyseSem(glob,loc,C->opr.op[0])) != (typeR = analyseSem(glob,loc,C->opr.op[1]))) {
+						fprintf(stderr, "Type mismatch on operator %s:\n",get_opr(C->opr.oper));
+						fprintf(stderr, "\t%s != %s\n",get_type(typeL),get_type(typeR));
+						exit(-1);
+					}
+					return typeL;
 					break;
 				case Se:
 					analyseSem(glob,loc,C->opr.op[0]);
 					analyseSem(glob,loc,C->opr.op[1]);
+					return typeL;
 					break;
 
 			}
 	}
+	return typeL;
 }
 
 void analyseFun(symbolTag* glob,symbolTag *fun) {
@@ -46,11 +65,11 @@ void analyseFun(symbolTag* glob,symbolTag *fun) {
 	argType *params = fun->_fun.args;
 	while(localVar != NULL) {
 		var(&localSym,localVar->name,localVar->type);
-		localVar = localVar->next;
+		localVar = (argType*) localVar->next;
 	}
 	while(params != NULL) {
 		var(&localSym,params->name,params->type);
-		params = params->next;
+		params = (argType*) params->next;
 	}
 	var(&localSym,fun->name,fun->_fun.type);
 	analyseSem(glob,localSym,fun->_fun.corps);
