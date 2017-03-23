@@ -8,7 +8,7 @@
 
 symbolTag* getID(symbolTag** hash,char *id) {
     symbolTag* s = NULL;
-    HASH_ADD_STR( *hash, name, s );
+    HASH_FIND_STR( *hash, id, s );
     return s;
 }
 void setID(symbolTag** hash,char *id, symbolTag* s) {
@@ -30,12 +30,13 @@ argType* arg(char *name, typeEnum type) {
     return a;
 
 }
-argType* addArg(argType *head,argType *arg) {
+argType* addArg(argType *lost_head,argType *arg) {
+    argType *head = lost_head;
     arg->next = NULL;
-    while(head->next != NULL) {
-        head = (argType*) head->next;
+    while(lost_head->next != NULL) {
+        lost_head = (argType*) lost_head->next;
     }
-    head->next = (struct argType*) arg;
+    lost_head->next = (struct argType*) arg;
     return head;
 }
 symbolTag* var(symbolTag** hash,char *id, typeEnum type) {
