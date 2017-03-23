@@ -1,26 +1,51 @@
 CC=gcc
 CFLAGS = -Wall -g
-LDFLAGS = 
-OBJS= test_symbole ppascal
+LDFLAGS = -ll
+OBJS= test_symbole ppascal analyseSem
 .PHONY: clean
 
 all : $(OBJS)
 
-ppascal: ppascal.tab.c ppascal.yy.c utils/symbol_table.c utils/AST.c
+
+
+ppascal: ppascal.o ppascal.yy.o ppascal.tab.o utils/symbol_table.o utils/AST.o utils/tools.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
+
+ppascal.o: ppascal.c ppascal.tab.h
+
+
 ppascal.tab.c ppascal.tab.h: ppascal.y
-	bison --debug -t -v -d ppascal.y -o $@
+	bison -t -v -d --output ppascal.tab.c ppascal.y
+
 
 ppascal.yy.c: ppascal.l ppascal.tab.h
 	flex -o $@ $< 
 
 
+analyseSem.o : analyseSem.c analyseSem.h ppascal.tab.h
+
+
+analyseSem: analyseSem.o ppascal.yy.o ppascal.tab.o utils/symbol_table.o utils/AST.o utils/tools.o
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+
+
+ppascal.tab.o: ppascal.tab.c ppascal.tab.h 
+
+utils/tools.o: utils/tools.c
+
+ppascal.yy.o: ppascal.yy.c ppascal.tab.h 
+
+
+utils/AST.o: utils/AST.c utils/AST.h
+
 
 utils/symbol_table.o : utils/symbol_table.c utils/symbol_table.h
 
+
 test_symbole: test_symbole.c utils/symbol_table.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+
 
 clean:
 	rm -f *.o *.output *.yy.c *.tab.* $(OBJS)

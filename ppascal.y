@@ -15,18 +15,8 @@ symbolTag* h_table = NULL;
 
 
 extern int yylex();
-int line = 1;
-
-void print_env(argType *glob,symbolTag* h_table) {
-  printf("Global var :\n");
-  argType *current = glob;
-  while(current!=NULL) {
-    printf("(%s,%s)\n",current->name,current->type == integer ? "Integer" : "Boolean");
-    current=(argType*)current->next;
-  }
-  printf("Function definition :\n");
-  print_table(&h_table);
-}
+extern int line;
+extern void ex(argType *glob,symbolTag* table,nodeType* C);
 
 %}
 
@@ -55,7 +45,7 @@ void print_env(argType *glob,symbolTag* h_table) {
 
 %type<nPtr> L_args L_argsnn E F C C0 Et
 %%
-MP: L_vart LD C               {print_env($1,h_table);}
+MP: L_vart LD C               {ex($1,h_table,$3); }
 
 E : E Pl E                    {$$ = opr(Pl,2,$1, $3);}
   | E Mo E                    {$$ = opr(Mo,2,$1, $3);}
@@ -136,9 +126,4 @@ int yyerror(char *s) {
 
 int yywrap() {
     return -1;
-}
-
-int main(int argn, char **argv) {
-    yydebug = 0;
-    return yyparse();
 }

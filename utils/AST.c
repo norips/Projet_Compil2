@@ -4,6 +4,9 @@
 #include <string.h>
 #include "AST.h"
 #include "enum.h"
+
+extern int yyerror(char *s);
+
 nodeType *con(int value, typeEnum type) {
     nodeType *p;
 

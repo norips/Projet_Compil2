@@ -5,7 +5,7 @@
 #include "utils/symbol_table.h"
 #include "ppascal.tab.h"
 
-extern int line;
+int line;
 %}
 %option noinput nounput
 %s NFON NPRO
