@@ -4,15 +4,17 @@
 #include "utils/AST.h"
 #include "utils/symbol_table.h"
 #include "ppascal.tab.h"
+
+extern int line;
 %}
 %option noinput nounput
 %s NFON NPRO
 %%
 [0-9]+            {yylval.i = atoi(yytext);return I;}
 boolean           {return T_boo;}
-integer          {return T_int;}
-defun             {return Def;}
-defpro            {return Dep;}
+integer           {return T_int;}
+defun             {BEGIN NFON; return Def;}
+defpro            {BEGIN NPRO; return Dep;}
 :=                {return Af;}
 true              {return true;}
 false             {return false;}
@@ -38,7 +40,8 @@ not               {return Not;}
 <NPRO>[A-Za-z0-9]+ {BEGIN INITIAL; yylval.id = strdup(yytext); return NPro;}
 
 [A-Za-z0-9]+      {yylval.id = strdup(yytext);return V;}
-[ \t\n]           {;} //Ignore
+[ \t]           {;} //Ignore
+[\n]			{line++;}
 
 .       {return yytext[0];}
 
