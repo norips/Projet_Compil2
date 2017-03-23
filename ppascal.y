@@ -15,7 +15,18 @@ symbolTag* h_table = NULL;
 
 
 extern int yylex();
+int line = 1;
 
+void print_env(argType *glob,symbolTag* h_table) {
+  printf("Global var :\n");
+  argType *current = glob;
+  while(current!=NULL) {
+    printf("(%s,%s)\n",current->name,current->type == integer ? "Integer" : "Boolean");
+    current=(argType*)current->next;
+  }
+  printf("Function definition :\n");
+  print_table(&h_table);
+}
 
 %}
 
@@ -43,9 +54,8 @@ extern int yylex();
 %type<tp> TP T_boo T_int T_ar
 
 %type<nPtr> L_args L_argsnn E F C C0 Et
-
 %%
-MP: L_vart LD C
+MP: L_vart LD C               {print_env($1,h_table);}
 
 E : E Pl E                    {$$ = opr(Pl,2,$1, $3);}
   | E Mo E                    {$$ = opr(Mo,2,$1, $3);}
@@ -111,7 +121,7 @@ D_entp: Dep NPro '(' L_argt ')'             {$$ = $2; fun(&h_table,$2,typeNone,$
 D_entf: Def NFon '(' L_argt ')' ':' TP      {$$ = $2; fun(&h_table,$2,$7,$4); }
 
 D: D_entp L_vart C                          {symbolTag *f = getID(&h_table,$1); if(f->type != typeFun) {yyerror("Identifier already declared");} f->_fun.local = $2; f->_fun.corps = $3;}
- | D_entf L_vart C                          {symbolTag *f = getID(&h_table,$1); if(f->type != typeFun) {yyerror("Identifier already declared");} f->_fun.local = $2; f->_fun.corps = $3;}
+ | D_entf L_vart C                          {symbolTag *f = getID(&h_table,$1);if(f->type != typeFun) {yyerror("Identifier already declared");} f->_fun.local = $2; f->_fun.corps = $3;}
 
 LD: %empty                                  
   | LD D                                   
@@ -120,7 +130,7 @@ LD: %empty
 
 
 int yyerror(char *s) {
-    fprintf(stderr, "*** ERRROR: %s\n",s);
+    fprintf(stderr, "*** ERRROR: Line : %d %s\n",line,s);
     return 0;
 }
 
@@ -129,6 +139,6 @@ int yywrap() {
 }
 
 int main(int argn, char **argv) {
-    yydebug = 1;
+    yydebug = 0;
     return yyparse();
 }
