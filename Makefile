@@ -6,7 +6,8 @@ OBJS= test_symbole ppascal analyseSem
 
 all : $(OBJS)
 
-
+%.c: %.y
+%.c: %.l
 
 ppascal: ppascal.o ppascal.yy.o ppascal.tab.o utils/symbol_table.o utils/AST.o utils/tools.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
