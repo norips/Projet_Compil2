@@ -54,7 +54,7 @@ E : E Pl E                    {$$ = opr(Pl,2,$1, $3);}
   | E Eq E                    {$$ = opr(Eq,2,$1, $3);}
   | E And E                   {$$ = opr(And,2,$1, $3);}
   | E Mu E                    {$$ = opr(Mu,2,$1, $3);}
-  | V '(' L_args ')'          {$$ = opr(Fun,2,$1, $3);}
+  | V '(' L_args ')'          {$$ = opr(Fun,2,id($1),$3);}
   | Et                        {$$ = $1;}
   | F                         {$$ = $1;}
 

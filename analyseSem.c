@@ -21,8 +21,15 @@ int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 					exit(-1);
 				}
 			}
-			return var->_var.type;
-
+			switch(var->type) {
+				case typeFun:
+					typeL = var->_fun.type;
+					break;
+				case typeVar:
+					typeL = var->_var.type;
+					break;
+			}
+			return typeL;
 			break;
 		case typeOpr:
 			switch(C->opr.oper) {
@@ -55,6 +62,24 @@ int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 					return typeL;
 					break;
 
+				case Fun:
+					typeL = analyseSem(glob,loc,C->opr.op[0]); //Type of fuction
+
+					//Test each parameters
+					nodeType *param = C->opr.op[1];
+					//Assuming idNodeType (function name)
+					symbolTag *fun = getID(&glob,C->opr.op[0]->id.id);
+					argType *arg = fun->_fun.args;
+					while(param != NULL) {
+						if(analyseSem(glob,loc,param->opr.op[0]) != arg->type) {
+							fprintf(stderr, "Type mismatch on parameters %s in %s call:\n",arg->name,C->opr.op[0]->id.id);
+							fprintf(stderr, "\t%s != %s\n",get_type(typeL),get_type(typeR));
+							exit(-1);
+						}
+						param = param->opr.op[1];
+						arg = (argType*) arg->next;
+					}
+					return typeL;
 			}
 	}
 	return typeL;
@@ -87,6 +112,7 @@ int ex(argType *glob,symbolTag* table,nodeType* C){
     		analyseFun(table,s);
     	}
     }
+    analyseSem(table,NULL,C);
 	return 1;
 }
 int main() {
