@@ -29,6 +29,7 @@ int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 				case Af:
 					if((typeL = analyseSem(glob,loc,C->opr.op[0])) != (typeR = analyseSem(glob,loc,C->opr.op[1]))) {
 						fprintf(stderr, "Type mismatch on affectation %s\n",C->opr.op[0]->id.id);
+						fprintf(stderr, "\t%s != %s\n",get_type(typeL),get_type(typeR));
 						exit(-1);
 					}
 					
@@ -77,6 +78,10 @@ void analyseFun(symbolTag* glob,symbolTag *fun) {
 
 int ex(argType *glob,symbolTag* table,nodeType* C){
 	symbolTag *s,*tmp;
+	while(glob != NULL) {
+		var(&table,glob->name,glob->type);
+		glob = (argType*) glob->next;
+	}
     HASH_ITER(hh,table, s, tmp) {
     	if(s->type == typeFun) {
     		analyseFun(table,s);
