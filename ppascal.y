@@ -64,11 +64,11 @@ F: '(' E ')'                  {$$ = $2;}
  | V                          {$$ = id($1);}
  | true                       {$$ = con(1,boolean);}
  | false                      {$$ = con(0,boolean);}
- | NewAr TP '[' E ']'         {$$;}
+ | NewAr TP '[' E ']'         {$$ = opr(NewAr,2,con(-1,$2),$4); } //Simulate type using a constant node
  ;
 
-Et: V '[' E ']'               {$$;}
-  | Et '[' E ']'              {$$;}
+Et: V '[' E ']'               {$$ = opr(Acc,2,id($1),$3);}
+  | Et '[' E ']'              {$$ = opr(Acc,2,$1,$3);}
 
 C0 : Et Af E                  {/*$$ = opr(Af,2,id($1), $3);*/ $$;}
   | V Af E                    {$$ = opr(Af,2,id($1), $3);}

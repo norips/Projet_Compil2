@@ -3,6 +3,7 @@
 #define Fun 800
 #define Pro 801
 #define L   802
+#define Acc 803 //Access to an array
 typedef enum { typeCon = 0, typeId, typeOpr } nodeEnum;
 typedef enum { typeVar = 10, typeFun, typePro, typeArr, typeVoid, typeNone } symEnum;
 typedef enum { integer = 20, boolean, arrInt, arrBool} typeEnum;

@@ -105,7 +105,7 @@ int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 					return typeL;
 					break;
 				case Pro:
-					typeL = typeVoid; //Type of fuction
+					typeL = typeVoid; //Type of procedure
 
 					//Test each parameters
 					param = C->opr.op[1];
