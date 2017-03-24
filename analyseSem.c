@@ -56,12 +56,23 @@ int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 					typeL = boolean;
 					return typeL;
 					break;
-				case Mo:
-				case Mu:
+
 				case Or:
 				case And:
-				case Pl:
 					if((typeL = analyseSem(glob,loc,C->opr.op[0])) != (typeR = analyseSem(glob,loc,C->opr.op[1]))) {
+						fprintf(stderr, "Type mismatch on operator %s:\n",get_opr(C->opr.oper));
+						fprintf(stderr, "\t%s != %s\n",get_type(typeL),get_type(typeR));
+						exit(-1);
+					}
+					if(typeL != boolean) {
+						fprintf(stderr, "Warning : Boolean operator %s on %s type\n",get_opr(C->opr.oper),get_type(typeL));
+					}
+					return typeL;
+					break;
+				case Pl:
+				case Mo:
+				case Mu:
+					if((typeL = analyseSem(glob,loc,C->opr.op[0])) != (typeR = analyseSem(glob,loc,C->opr.op[1])) || typeL != integer || typeR != integer ) {
 						fprintf(stderr, "Type mismatch on operator %s:\n",get_opr(C->opr.oper));
 						fprintf(stderr, "\t%s != %s\n",get_type(typeL),get_type(typeR));
 						exit(-1);

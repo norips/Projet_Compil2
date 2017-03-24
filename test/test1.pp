@@ -14,4 +14,6 @@ defun equal(x:integer,y:integer) : boolean {
 a:=2;
 
 setRes(a);
+b := equal(res,a) and true;
+a := 1 and 1;
 res:=sum(a,2)
