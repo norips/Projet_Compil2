@@ -4,10 +4,11 @@
 #include "ppascal.tab.h"
 #include "utils/uthash.h"
 #include "utils/tools.h"
+#include "utils/enum.h"
 
 
 int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
-	int typeL = -1, typeR = -1;
+	int typeL = typeNone, typeR = typeNone;
 	switch(C->type) {
 		case typeCon:
 			return C->con.type;
@@ -28,6 +29,8 @@ int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 				case typeVar:
 					typeL = var->_var.type;
 					break;
+				default:
+					typeL = typeNone;
 			}
 			return typeL;
 			break;
@@ -35,6 +38,7 @@ int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 			switch(C->opr.oper) {
 				case Af:
 					if((typeL = analyseSem(glob,loc,C->opr.op[0])) != (typeR = analyseSem(glob,loc,C->opr.op[1]))) {
+						analyseSem(glob,loc,C->opr.op[1]);
 						fprintf(stderr, "Type mismatch on affectation %s\n",C->opr.op[0]->id.id);
 						fprintf(stderr, "\t%s != %s\n",get_type(typeL),get_type(typeR));
 						exit(-1);
@@ -42,11 +46,19 @@ int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 					
 					return typeL;
 					break;
+				case Lt:
+				case Eq:
+					if((typeL = analyseSem(glob,loc,C->opr.op[0])) != (typeR = analyseSem(glob,loc,C->opr.op[1]))) {
+						fprintf(stderr, "Type mismatch on operator %s:\n",get_opr(C->opr.oper));
+						fprintf(stderr, "\t%s != %s\n",get_type(typeL),get_type(typeR));
+						exit(-1);
+					}
+					typeL = boolean;
+					return typeL;
+					break;
 				case Mo:
 				case Mu:
 				case Or:
-				case Lt:
-				case Eq:
 				case And:
 				case Pl:
 					if((typeL = analyseSem(glob,loc,C->opr.op[0])) != (typeR = analyseSem(glob,loc,C->opr.op[1]))) {
@@ -70,6 +82,25 @@ int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 					//Assuming idNodeType (function name)
 					symbolTag *fun = getID(&glob,C->opr.op[0]->id.id);
 					argType *arg = fun->_fun.args;
+					while(param != NULL) {
+						if(analyseSem(glob,loc,param->opr.op[0]) != arg->type) {
+							fprintf(stderr, "Type mismatch on parameters %s in %s call:\n",arg->name,C->opr.op[0]->id.id);
+							fprintf(stderr, "\t%s != %s\n",get_type(typeL),get_type(typeR));
+							exit(-1);
+						}
+						param = param->opr.op[1];
+						arg = (argType*) arg->next;
+					}
+					return typeL;
+					break;
+				case Pro:
+					typeL = typeVoid; //Type of fuction
+
+					//Test each parameters
+					param = C->opr.op[1];
+					//Assuming idNodeType (function name)
+					fun = getID(&glob,C->opr.op[0]->id.id);
+					arg = fun->_fun.args;
 					while(param != NULL) {
 						if(analyseSem(glob,loc,param->opr.op[0]) != arg->type) {
 							fprintf(stderr, "Type mismatch on parameters %s in %s call:\n",arg->name,C->opr.op[0]->id.id);

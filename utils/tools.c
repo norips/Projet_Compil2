@@ -41,6 +41,9 @@ char *get_type(int type) {
 		case typeNone:
 			message = "typeNone";
 			break;
+		case typeVoid:
+			message = "typeVoid";
+			break;
 		case integer:
 			message = "integer";
 			break;
