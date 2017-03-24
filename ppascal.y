@@ -70,7 +70,7 @@ F: '(' E ')'                  {$$ = $2;}
 Et: V '[' E ']'               {$$ = opr(Acc,2,id($1),$3);}
   | Et '[' E ']'              {$$ = opr(Acc,2,$1,$3);}
 
-C0 : Et Af E                  {/*$$ = opr(Af,2,id($1), $3);*/ $$;}
+C0 : Et Af E                  {$$ = opr(Aft,2,$1, $3);}
   | V Af E                    {$$ = opr(Af,2,id($1), $3);}
   | Sk                        {$$ = opr(Sk,2,NULL,NULL);}
   | '{' C '}'                 {$$ = $2;}
