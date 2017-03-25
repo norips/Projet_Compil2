@@ -29,4 +29,5 @@ sum:=3;
 setRes(a);
 b := equal(res,a) and true;
 a := 1 and 1;
-res:=fibo(5)
+res:=fibo(5);
+equal(res,a)

@@ -85,13 +85,19 @@ int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 					return typeL;
 					break;
 
-				case Fun:
+				case Pro:
+				case Fun: ;
+					//Assuming idNodeType (function name)
+					symbolTag *fun = getID(&glob,C->opr.op[0]->id.id);
+					if(fun->type != typeFun && fun->type != typePro ) {
+							fprintf(stderr, KRED "Near line %d \t%s is not a function\n" KNRM,C->lineNum,C->opr.op[0]->id.id);
+							exit(-1);
+					}
 					//Reverse global and local symbol table, function is in global table (opposite of var logic)
 					typeL = analyseSem(loc,glob,C->opr.op[0]); //Type of fuction
 					//Test each parameters
 					nodeType *param = C->opr.op[1];
-					//Assuming idNodeType (function name)
-					symbolTag *fun = getID(&glob,C->opr.op[0]->id.id);
+
 					argType *arg = fun->_fun.args;
 					while(arg != NULL && param != NULL ) {
 						if(analyseSem(glob,loc,param->opr.op[0]) != arg->type) {
@@ -111,41 +117,6 @@ int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 							exit(-1);
 						}
 					}
-					return typeL;
-					break;
-				case Pro:
-					//Reverse global and local symbol table, function is in global table (opposite of var logic)
-					typeL = analyseSem(loc,glob,C->opr.op[0]); //Type of fuction
-					if(typeL != typePro) {
-						fprintf(stderr, KRED "Near line %d \tProcedure call on not a procedure call: %s\n" KNRM,C->lineNum,C->opr.op[0]->id.id);
-						fprintf(stderr, KRED "\t%s != %s\n" KNRM,get_type(typeL),get_type(typeR));
-						exit(-1);
-					}
-
-					//Test each parameters
-					param = C->opr.op[1];
-					//Assuming idNodeType (function name)
-					fun = getID(&glob,C->opr.op[0]->id.id);
-					arg = fun->_fun.args;
-					while(arg != NULL && param != NULL ) {
-						if(analyseSem(glob,loc,param->opr.op[0]) != arg->type) {
-							fprintf(stderr, KRED "Near line %d \tType mismatch on parameters %s in %s call:\n" KNRM,C->lineNum,arg->name,C->opr.op[0]->id.id);
-							fprintf(stderr, KRED "\t%s != %s\n" KNRM,get_type(typeL),get_type(typeR));
-							exit(-1);
-						}
-						param = param->opr.op[1];
-						arg = (argType*) arg->next;
-					}
-					if(arg != NULL || param != NULL) {
-						if(arg != NULL) {
-							fprintf(stderr, KRED "Near line %d \tNot enough arguments in %s call:\n" KNRM,C->lineNum,C->opr.op[0]->id.id);
-							exit(-1);
-						} else {
-							fprintf(stderr, KRED "Near line %d \tToo much arguments in %s call:\n" KNRM,C->lineNum,C->opr.op[0]->id.id);
-							exit(-1);
-						}
-					}
-
 					return typeL;
 					break;
 				case Acc:
