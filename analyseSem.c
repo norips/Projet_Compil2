@@ -93,7 +93,7 @@ int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 					//Assuming idNodeType (function name)
 					symbolTag *fun = getID(&glob,C->opr.op[0]->id.id);
 					argType *arg = fun->_fun.args;
-					while(param != NULL) {
+					while(arg != NULL && param != NULL ) {
 						if(analyseSem(glob,loc,param->opr.op[0]) != arg->type) {
 							fprintf(stderr, KRED "Near line %d \tType mismatch on parameters %s in %s call:\n" KNRM,C->lineNum,arg->name,C->opr.op[0]->id.id);
 							fprintf(stderr, KRED "\t%s != %s\n" KNRM,get_type(typeL),get_type(typeR));
@@ -101,6 +101,15 @@ int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 						}
 						param = param->opr.op[1];
 						arg = (argType*) arg->next;
+					}
+					if(arg != NULL || param != NULL) {
+						if(arg != NULL) {
+							fprintf(stderr, KRED "Near line %d \tNot enough arguments in %s call:\n" KNRM,C->lineNum,C->opr.op[0]->id.id);
+							exit(-1);
+						} else {
+							fprintf(stderr, KRED "Near line %d \tToo much arguments in %s call:\n" KNRM,C->lineNum,C->opr.op[0]->id.id);
+							exit(-1);
+						}
 					}
 					return typeL;
 					break;
@@ -112,7 +121,7 @@ int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 					//Assuming idNodeType (function name)
 					fun = getID(&glob,C->opr.op[0]->id.id);
 					arg = fun->_fun.args;
-					while(param != NULL) {
+					while(arg != NULL && param != NULL ) {
 						if(analyseSem(glob,loc,param->opr.op[0]) != arg->type) {
 							fprintf(stderr, KRED "Near line %d \tType mismatch on parameters %s in %s call:\n" KNRM,C->lineNum,arg->name,C->opr.op[0]->id.id);
 							fprintf(stderr, KRED "\t%s != %s\n" KNRM,get_type(typeL),get_type(typeR));
@@ -121,6 +130,16 @@ int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 						param = param->opr.op[1];
 						arg = (argType*) arg->next;
 					}
+					if(arg != NULL || param != NULL) {
+						if(arg != NULL) {
+							fprintf(stderr, KRED "Near line %d \tNot enough arguments in %s call:\n" KNRM,C->lineNum,C->opr.op[0]->id.id);
+							exit(-1);
+						} else {
+							fprintf(stderr, KRED "Near line %d \tToo much arguments in %s call:\n" KNRM,C->lineNum,C->opr.op[0]->id.id);
+							exit(-1);
+						}
+					}
+
 					return typeL;
 					break;
 				case Acc:
