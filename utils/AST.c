@@ -36,7 +36,7 @@ nodeType *id(char *id) {
     return p;
 }
 
-nodeType *opr(int oper, int nops, ...) {
+nodeType *opr(int line,int oper, int nops, ...) {
     va_list ap;
     nodeType *p;
     int i;
@@ -47,6 +47,7 @@ nodeType *opr(int oper, int nops, ...) {
 
     /* copy information */
     p->type = typeOpr;
+    p->lineNum = line;
     p->opr.oper = oper;
     p->opr.nops = nops;
     va_start(ap, nops);

@@ -47,14 +47,14 @@ extern void ex(argType *glob,symbolTag* table,nodeType* C);
 %%
 MP: L_vart LD C               {ex($1,h_table,$3); }
 
-E : E Pl E                    {$$ = opr(Pl,2,$1, $3);}
-  | E Mo E                    {$$ = opr(Mo,2,$1, $3);}
-  | E Or E                    {$$ = opr(Or,2,$1, $3);}
-  | E Lt E                    {$$ = opr(Lt,2,$1, $3);}
-  | E Eq E                    {$$ = opr(Eq,2,$1, $3);}
-  | E And E                   {$$ = opr(And,2,$1, $3);}
-  | E Mu E                    {$$ = opr(Mu,2,$1, $3);}
-  | V '(' L_args ')'          {$$ = opr(Fun,2,id($1),$3);}
+E : E Pl E                    {$$ = opr(line,Pl,2,$1, $3);}
+  | E Mo E                    {$$ = opr(line,Mo,2,$1, $3);}
+  | E Or E                    {$$ = opr(line,Or,2,$1, $3);}
+  | E Lt E                    {$$ = opr(line,Lt,2,$1, $3);}
+  | E Eq E                    {$$ = opr(line,Eq,2,$1, $3);}
+  | E And E                   {$$ = opr(line,And,2,$1, $3);}
+  | E Mu E                    {$$ = opr(line,Mu,2,$1, $3);}
+  | V '(' L_args ')'          {$$ = opr(line,Fun,2,id($1),$3);}
   | Et                        {$$ = $1;}
   | F                         {$$ = $1;}
 
@@ -64,28 +64,28 @@ F: '(' E ')'                  {$$ = $2;}
  | V                          {$$ = id($1);}
  | true                       {$$ = con(1,boolean);}
  | false                      {$$ = con(0,boolean);}
- | NewAr TP '[' E ']'         {$$ = opr(NewAr,2,con(-1,$2),$4); } //Simulate type using a constant node
+ | NewAr TP '[' E ']'         {$$ = opr(line,NewAr,2,con(-1,$2),$4); } //Simulate type using a constant node
  ;
 
-Et: V '[' E ']'               {$$ = opr(Acc,2,id($1),$3);}
-  | Et '[' E ']'              {$$ = opr(Acc,2,$1,$3);}
+Et: V '[' E ']'               {$$ = opr(line,Acc,2,id($1),$3);}
+  | Et '[' E ']'              {$$ = opr(line,Acc,2,$1,$3);}
 
-C0 : Et Af E                  {$$ = opr(Aft,2,$1, $3);}
-  | V Af E                    {$$ = opr(Af,2,id($1), $3);}
-  | Sk                        {$$ = opr(Sk,2,NULL,NULL);}
+C0 : Et Af E                  {$$ = opr(line,Aft,2,$1, $3);}
+  | V Af E                    {$$ = opr(line,Af,2,id($1), $3);}
+  | Sk                        {$$ = opr(line,Sk,2,NULL,NULL);}
   | '{' C '}'                 {$$ = $2;}
-  | If E Th C0 El C0          {$$ = opr(If,3,$2,$4,$6);}
-  | Wh E Do C0                {$$ = opr(Wh,2,$2,$4);}
-  | V '(' L_args ')'          {$$ = opr(Pro,2,id($1),$3);}
+  | If E Th C0 El C0          {$$ = opr(line,If,3,$2,$4,$6);}
+  | Wh E Do C0                {$$ = opr(line,Wh,2,$2,$4);}
+  | V '(' L_args ')'          {$$ = opr(line,Pro,2,id($1),$3);}
 
-C: C Se C0                    {$$ = opr(Se,2,$1,$3);}
+C: C Se C0                    {$$ = opr(line,Se,2,$1,$3);}
  | C0                         {$$ = $1;}
 
 L_args: %empty                {$$ = NULL;}
       | L_argsnn              {$$ = $1;}
 
-L_argsnn: E                   {$$ = opr(L,2,$1,NULL);}
-        | E ',' L_argsnn      {$$ = opr(L,2,$1,$3);}
+L_argsnn: E                   {$$ = opr(line,L,2,$1,NULL);}
+        | E ',' L_argsnn      {$$ = opr(line,L,2,$1,$3);}
 
 L_argt: %empty                {$$ = NULL;}
       | L_argtnn              {$$ = $1;}

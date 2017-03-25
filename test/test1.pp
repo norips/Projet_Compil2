@@ -17,4 +17,5 @@ arr:=new array of integer[a];
 setRes(a);
 b := equal(res,a) and true;
 a := 1 and 1;
+b := 3;
 res:=sum(a,2)

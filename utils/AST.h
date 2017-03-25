@@ -23,7 +23,7 @@ typedef struct {
 
 typedef struct nodeTypeTag {
     nodeEnum type;              /* type of node */
-
+    int lineNum;
     union {
         conNodeType con;        /* constants */
         idNodeType id;          /* identifiers */
@@ -33,7 +33,7 @@ typedef struct nodeTypeTag {
 
 extern char* sym[100];
 
-nodeType *opr(int oper, int nops, ...);
+nodeType *opr(int line,int oper, int nops, ...);
 nodeType *id(char *id);
 nodeType *con(int value,typeEnum type);
 void freeNode(nodeType *p);
