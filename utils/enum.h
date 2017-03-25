@@ -14,6 +14,6 @@
 #define Acc 803 //Access to an array
 #define Aft 804 //Affection to an array
 typedef enum { typeCon = 0, typeId, typeOpr } nodeEnum;
-typedef enum { typeVar = 10, typeFun, typePro, typeArr, typeVoid, typeNone } symEnum;
-typedef enum { integer = 20, boolean, arrInt, arrBool} typeEnum;
+typedef enum { typeVar = 10, typeFun, typePro, typeArr, typeNone } symEnum;
+typedef enum { integer = 20, boolean, arrInt, arrBool, typeVoid} typeEnum;
 #endif 

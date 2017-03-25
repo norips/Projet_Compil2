@@ -11,8 +11,14 @@ symbolTag* getID(symbolTag** hash,char *id) {
     HASH_FIND_STR( *hash, id, s );
     return s;
 }
-void setID(symbolTag** hash,char *id, symbolTag* s) {
-    HASH_ADD_STR( *hash, name, s );
+int setID(symbolTag** hash,char *id, symbolTag* s) {
+    symbolTag* stmp = NULL;
+    HASH_FIND_STR( *hash, id, stmp );
+    if(stmp == NULL) {
+        HASH_ADD_STR( *hash, name, s );
+        return 0;
+    }
+    return -1;
 }
 symbolTag* fun(symbolTag** hash,char *id ,typeEnum type ,argType* args) {
     symbolTag* s = malloc(sizeof(symbolTag));
@@ -45,7 +51,9 @@ symbolTag* var(symbolTag** hash,char *id, typeEnum type) {
     strncpy(s->name, id,MAX_SIZE_ID);
     s->type = typeVar;
     s->_var.type = type;
-    HASH_ADD_STR( *hash, name, s );
+    if(setID(hash,id,s) == -1) {
+        return NULL;
+    }
     return s;
 }
 

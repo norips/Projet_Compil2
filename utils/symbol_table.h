@@ -39,7 +39,7 @@ typedef struct {
 
 symbolTag* getID(symbolTag** hash,char *id);
 
-void setID(symbolTag** hash,char *id, symbolTag* s);
+int setID(symbolTag** hash,char *id, symbolTag* s);
 
 symbolTag* fun(symbolTag** hash,char *id,typeEnum type, argType* args);
 

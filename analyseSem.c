@@ -185,21 +185,33 @@ void analyseFun(symbolTag* glob,symbolTag *fun) {
 	argType *localVar = fun->_fun.local;
 	argType *params = fun->_fun.args;
 	while(localVar != NULL) {
-		var(&localSym,localVar->name,localVar->type);
+		if(var(&localSym,localVar->name,localVar->type) == NULL) {
+			fprintf(stderr, KRED "Already defined %s in %s\n" KNRM,localVar->name,fun->name);
+			exit(-1);
+		}
 		localVar = (argType*) localVar->next;
 	}
 	while(params != NULL) {
-		var(&localSym,params->name,params->type);
+		if(var(&localSym,params->name,params->type) == NULL) {
+			fprintf(stderr, KRED "Already defined %s in %s parameters\n" KNRM,params->name,params->name);
+			exit(-1);
+		}
 		params = (argType*) params->next;
 	}
-	var(&localSym,fun->name,fun->_fun.type);
+	if(var(&localSym,fun->name,fun->_fun.type) == NULL) {			
+		fprintf(stderr, KRED "Local var may have the same name as function %s parameters\n" KNRM,fun->name);
+		exit(-1);
+	}
 	analyseSem(glob,localSym,fun->_fun.corps);
 }
 
 int ex(argType *glob,symbolTag* table,nodeType* C){
 	symbolTag *s,*tmp;
 	while(glob != NULL) {
-		var(&table,glob->name,glob->type);
+		if(var(&table,glob->name,glob->type) == NULL) {
+			fprintf(stderr, KRED "Already defined %s (maybe as a function ?)\n" KNRM,glob->name);
+			exit(-1);	
+		}
 		glob = (argType*) glob->next;
 	}
     HASH_ITER(hh,table, s, tmp) {
