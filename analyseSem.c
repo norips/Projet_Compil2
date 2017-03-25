@@ -86,8 +86,8 @@ int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 					break;
 
 				case Fun:
-					typeL = analyseSem(glob,loc,C->opr.op[0]); //Type of fuction
-
+					//Reverse global and local symbol table, function is in global table (opposite of var logic)
+					typeL = analyseSem(loc,glob,C->opr.op[0]); //Type of fuction
 					//Test each parameters
 					nodeType *param = C->opr.op[1];
 					//Assuming idNodeType (function name)
@@ -114,7 +114,13 @@ int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 					return typeL;
 					break;
 				case Pro:
-					typeL = typeVoid; //Type of procedure
+					//Reverse global and local symbol table, function is in global table (opposite of var logic)
+					typeL = analyseSem(loc,glob,C->opr.op[0]); //Type of fuction
+					if(typeL != typePro) {
+						fprintf(stderr, KRED "Near line %d \tProcedure call on not a procedure call: %s\n" KNRM,C->lineNum,C->opr.op[0]->id.id);
+						fprintf(stderr, KRED "\t%s != %s\n" KNRM,get_type(typeL),get_type(typeR));
+						exit(-1);
+					}
 
 					//Test each parameters
 					param = C->opr.op[1];
@@ -175,6 +181,20 @@ int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 					}
 					return typeL;
 					break;
+				case If:
+				case Wh:
+					//Test if first condition is boolean type
+					typeL = analyseSem(glob,loc,C->opr.op[0]);
+					if(typeL != boolean) {
+						fprintf(stderr, KRED "Near line %d \tCondition is not a boolean:\n" KNRM,C->lineNum);
+						exit(-1);
+					}
+					analyseSem(glob,loc,C->opr.op[1]);
+					if(C->opr.oper == If) {
+						analyseSem(glob,loc,C->opr.op[2]);
+					}
+					typeL = typeVoid;
+					return typeL;
 			}
 	}
 	return typeL;

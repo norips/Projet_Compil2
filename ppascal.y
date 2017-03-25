@@ -107,9 +107,9 @@ L_vart: %empty                      {$$ = NULL;}
 L_vartnn: Var Argt                  {$$ = $2;}
         | L_vartnn ',' Var Argt     {$$ = addArg($1,$4);}
 
-D_entp: Dep NPro '(' L_argt ')'             {$$ = $2; fun(&h_table,$2,typeNone,$4);}
+D_entp: Dep NPro '(' L_argt ')'             {$$ = $2; if(fun(&h_table,$2,typePro,$4) == NULL){fprintf(stderr, KRED "Near line : %d\tAlready defined %s\n" KNRM,line,$2);exit(-1);} }
 
-D_entf: Def NFon '(' L_argt ')' ':' TP      {$$ = $2; fun(&h_table,$2,$7,$4); }
+D_entf: Def NFon '(' L_argt ')' ':' TP      {$$ = $2; if(fun(&h_table,$2,$7,$4)== NULL) {fprintf(stderr, KRED "Near line : %d\tAlready defined %s\n" KNRM,line,$2);exit(-1);} }
 
 D: D_entp L_vart C                          {symbolTag *f = getID(&h_table,$1); if(f->type != typeFun) {yyerror("Identifier already declared");} f->_fun.local = $2; f->_fun.corps = $3;}
  | D_entf L_vart C                          {symbolTag *f = getID(&h_table,$1);if(f->type != typeFun) {yyerror("Identifier already declared");} f->_fun.local = $2; f->_fun.corps = $3;}

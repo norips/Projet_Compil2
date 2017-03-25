@@ -26,7 +26,9 @@ symbolTag* fun(symbolTag** hash,char *id ,typeEnum type ,argType* args) {
     s->type = typeFun;
     s->_fun.args = args;
     s->_fun.type = type;
-    HASH_ADD_STR( *hash, name, s );
+    if(setID(hash,id,s) == -1) {
+        return NULL;
+    }
     return s;
 }
 argType* arg(char *name, typeEnum type) {
