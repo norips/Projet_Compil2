@@ -4,6 +4,18 @@ defun sum(x:integer,y:integer) : integer {
 	sum := x + y
 }
 
+defun fibo(n:integer) : integer {
+	if n=0 then {
+		fibo:=0
+	} else {
+		if n=1 then {
+			fibo:=1
+		} else {
+			fibo:= fibo(n-1) + fibo(n-2)
+		}
+	}
+}
+
 defpro setRes(x:integer) {
 	res := x
 }
@@ -17,4 +29,4 @@ sum:=3;
 setRes(a);
 b := equal(res,a) and true;
 a := 1 and 1;
-res:=sum(a,2)
+res:=fibo(5)
