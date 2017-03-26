@@ -10,7 +10,7 @@
 
 void printNode(nodeType * node)
 {
-   printf("\n### DEBUG ### printNode() node type: %s\n", get_opr(node->type));
+   //printf("\n### DEBUG ### printNode() node type: %s\n", get_opr(node->type));
    
    if (node->type == typeCon)
    {
@@ -40,62 +40,57 @@ void printNode(nodeType * node)
    {
       /* Operator */
 
-      nodeType * op = node->opr.op[0];
-
-      printf("### DEBUG ### operator type: %s\n", get_opr(node->opr.oper));
+      nodeType * opL = node->opr.op[0];
+      nodeType * opR = node->opr.op[1];
+      //printf("### DEBUG ### operator type: %s\n", get_opr(node->opr.oper));
       
       switch (node->opr.oper)
       {
          case Pl:
-            printf("("); printNode(&op[0]); printf(" + "); printNode(&op[1]); printf(")");
+            printf("("); printNode(opL); printf(" + "); printNode(opR); printf(")");
             break;
             
          case Mo:
-            printf("("); printNode(&op[0]); printf(" - "); printNode(&op[1]); printf(")");
+            printf("("); printNode(opL); printf(" - "); printNode(opR); printf(")");
             break;
             
          case Or:
-            printf("("); printNode(&op[0]); printf(" or "); printNode(&op[1]); printf(")");
+            printf("("); printNode(opL); printf(" or "); printNode(opR); printf(")");
             break;
             
          case Lt:
-            printf("("); printNode(&op[0]); printf(" <= "); printNode(&op[1]); printf(")");
+            printf("("); printNode(opL); printf(" <= "); printNode(opR); printf(")");
             break;
             
          case Eq:
-            printf("("); printNode(&op[0]); printf(" = "); printNode(&op[1]); printf(")");
+            printf("("); printNode(opL); printf(" = "); printNode(opR); printf(")");
             break;
             
          case And:
-            printf("("); printNode(&op[0]); printf(" and "); printNode(&op[1]); printf(")");
+            printf("("); printNode(opL); printf(" and "); printNode(opR); printf(")");
             break;
             
          case Mu:
-            printf("("); printNode(&op[0]); printf(" * "); printNode(&op[1]); printf(")");
+            printf("("); printNode(opL); printf(" * "); printNode(opR); printf(")");
             break;
             
          case NewAr:
             printf("new array of ");
-            if (op[0].con.type->type == integer)
-               printf("integer ");
-            else if (op[0].con.type->type == boolean)
-               printf("boolean ");
-            else
-               error("invalid array type");
+            get_type(opL->con.type);
 
-            printf("["); printNode(&op[1]); printf("]");
+            printf("["); printNode(opR); printf("]");
             break;
             
          case Acc:
-            printNode(&op[0]); printf("["); printNode(&op[1]); printf("]");
+            printNode(opL); printf("["); printNode(opR); printf("]");
             break;
             
          case Aft:
-            printNode(&op[0]); printf(" := "); printNode(&op[1]);
+            printNode(opL); printf(" := "); printNode(opR);
             break;
             
          case Af:
-            printNode(&op[0]); printf(" := "); printNode(&op[1]);
+            printNode(opL); printf(" := "); printNode(opR);
             break;
             
          case Sk:
@@ -103,32 +98,33 @@ void printNode(nodeType * node)
             break;
             
          case If:
-            printf("if "); printNode(&op[0]); printf(" then\n");
+            printf("if "); printNode(opL); printf(" then\n");
 
             printf("{\n");
-            printNode(&op[1]);
+            printNode(opR);
             printf("\n}\n");
             
             printf("else\n");
             printf("{\n");
-            printNode(&op[2]);
+            printNode(node->opr.op[2]);
             printf("\n}\n");
             break;
             
          case Wh:
-            printf("while "); printNode(&op[0]); printf(" do\n");
+            printf("while "); printNode(opL); printf(" do\n");
 
             printf("{\n");
-            printNode(&op[1]);
+            printNode(opR);
             printf("\n}\n");
             break;
             
          case Se:
-            printNode(&op[0]); printf(";\n");
-            printNode(&op[1]);
+            printNode(opL); printf(";\n");
+            printNode(opR);
             break;
 
-         default:;
+         default:
+            printf("Missing case for op %s\n",get_opr(node->opr.oper));
       }
    }
    else

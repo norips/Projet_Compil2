@@ -109,8 +109,10 @@ char* get_opr(int opr) {
 		case typeOpr:
 			return ("Operator");
 			
-		default:
-			return ("Unknown op");
+		default:;
+			char *str=malloc(sizeof(char)*15);
+			sprintf(str, "Unknown op : %d", opr);
+			return str;
 			
 
 	}
