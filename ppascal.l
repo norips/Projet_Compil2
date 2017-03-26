@@ -24,7 +24,8 @@ then              {return Th;}
 else              {return El;}
 var               {return Var;}
 while             {return Wh;}
-Do                {return Do;}
+do                {return Do;}
+skip			  {return Sk;}
 "+"               {return Pl;}
 "-"               {return Mo;}
 "*"               {return Mu;}
@@ -32,6 +33,7 @@ and               {return And;}
 or                {return Or;}
 not               {return Not;}
 "<="              {return Lt;}
+"<"               {return Lo;}
 "="               {return Eq;}
 "array of"        {return T_ar;}
 "new array of"    {return NewAr;}

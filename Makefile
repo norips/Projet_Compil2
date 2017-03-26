@@ -2,7 +2,8 @@ CC=gcc
 CFLAGS = -Wall -g
 LDFLAGS = -ll
 OBJS= test_symbole ppascal analyseSem
-.PHONY: clean
+TEST = $(wildcard test/*.pp)
+.PHONY: clean test
 
 all : $(OBJS)
 
@@ -48,7 +49,12 @@ utils/print_program.o : utils/print_program.c utils/print_program.h ppascal.tab.
 test_symbole: test_symbole.c utils/symbol_table.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
+test: analyseSem
+	for test in $(TEST); do \
+		./analyseSem < $$test > $$test.sem;\
+	done
+	
 
 clean:
 	rm -f *.o *.output *.yy.c *.tab.* $(OBJS)
-	rm -f utils/*.o utils/*.tab.*
+	rm -f utils/*.o utils/*.tab.* test/*.sem

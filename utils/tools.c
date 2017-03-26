@@ -7,60 +7,33 @@ void print_env(argType *glob,symbolTag* table) {
   printf("Global var :\n");
   argType *current = glob;
   while(current!=NULL) {
-    printf("(%s,%s)\n",current->name,current->type == integer ? "Integer" : "Boolean");
+    printf("(%s,%s)\n",current->name,get_type(current->type));
     current=(argType*)current->next;
   }
   printf("\nFunction definition :\n");
   print_table(&table);
 }
 
-char *get_type(int type) {
-	char *message = NULL;
-	switch(type) {
-		case typeCon:
-			message = "typeCon";
-			break;
-		case typeId:
-			message = "typeId";
-			break;
-		case typeOpr:
-			message = "typeOpr";
-			break;
-		case typeVar:
-			message = "typeVar";
-			break;
-		case typeFun:
-			message = "typeFun";
-			break;
-		case typePro:
-			message = "typePro";
-			break;
-		case typeArr:
-			message = "typeArr";
-			break;
-		case typeNone:
-			message = "typeNone";
-			break;
-		case typeVoid:
-			message = "typeVoid";
-			break;
-		case integer:
-			message = "integer";
-			break;
-		case boolean:
-			message = "boolean";
-			break;
-		case arrInt:
-			message = "arrInt";
-			break;
-		case arrBool:
-			message = "arrBool";
-			break;
-		default:
-			message = "Unknown type";
-			break;
+char *get_type(typeStruct *type) {
+	char *buffer = malloc(sizeof(char)*1024);
+	while(type != NULL) {
+		switch(type->type) {
+			case integer:
+				strcat(buffer,"integer ");
+				break;
+			case boolean:
+				strcat(buffer,"boolean ");
+				break;
+			case arrOf:
+				strcat(buffer,"arrOf ");
+				break;
+			default:
+				strcat(buffer,"Unknown type ");
+				break;
+		}
+		type = (typeStruct*) type->next;
 	}
-	return message;
+	return buffer;
 
 }
 
@@ -88,7 +61,28 @@ char* get_opr(int opr) {
 		case Pl:
 			message = "Pl";
 			break;
-			
+		case Pro:
+			message = "Pro";
+			break;
+		case Fun:
+			message = "Fun";
+			break;
+		case Acc:
+			message = "Acc";
+			break;
+		case Aft:
+			message = "Aft";
+			break;
+		case NewAr:
+			message = "NewAr";
+			break;
+		case If:
+			message = "If";
+			break;
+		case Wh:
+			message = "Wh";
+			break;
+
 	}
 	return message;
 }

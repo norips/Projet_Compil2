@@ -8,19 +8,19 @@
 #define MAX_SIZE_ID 256
 /* constants */
 typedef struct {
-    int type;                  /* type of var */
+    typeStruct *type;                  /* type of var */
 } varType;
 
 
 typedef struct {
-    typeEnum type;
+    typeStruct* type;
     char name[MAX_SIZE_ID];
     struct argType* next;
 } argType;
 
 /* identifiers */
 typedef struct {
-    typeEnum type;
+    typeStruct* type;
     argType *args ;                      /* subscript to sym array */
     argType *local ;                      /* subscript to sym array */
     nodeType *corps;
@@ -41,13 +41,16 @@ symbolTag* getID(symbolTag** hash,char *id);
 
 int setID(symbolTag** hash,char *id, symbolTag* s);
 
-symbolTag* fun(symbolTag** hash,char *id,typeEnum type, argType* args);
+symbolTag* fun(symbolTag** hash,char *id,typeStruct* type, argType* args);
 
-argType* arg(char *name, typeEnum type);
+argType* arg(char *name, typeStruct* type);
 
 argType* addArg(argType *parent, argType *arg);
 
-symbolTag* var(symbolTag** hash,char *id, typeEnum type);
+typeStruct *type(typeEnum type);
+typeStruct *addType(typeStruct* type, typeStruct* next);
+
+symbolTag* var(symbolTag** hash,char *id, typeStruct* type);
 
 void print_table(symbolTag** hash);
 
