@@ -24,7 +24,7 @@ then              {return Th;}
 else              {return El;}
 var               {return Var;}
 while             {return Wh;}
-Do                {return Do;}
+do                {return Do;}
 "+"               {return Pl;}
 "-"               {return Mo;}
 "*"               {return Mu;}
