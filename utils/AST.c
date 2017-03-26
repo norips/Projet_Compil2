@@ -7,7 +7,7 @@
 
 extern int yyerror(char *s);
 
-nodeType *con(int value, typeEnum type) {
+nodeType *con(int value, typeStruct* type) {
     nodeType *p;
 
     /* allocate node */

@@ -6,7 +6,7 @@ extern int yyerror(char *s);
 /* constants */
 typedef struct {
     int value;                  /* value of constant */
-    typeEnum type;
+    typeStruct* type;
 } conNodeType;
 
 /* identifiers */
@@ -35,7 +35,7 @@ extern char* sym[100];
 
 nodeType *opr(int line,int oper, int nops, ...);
 nodeType *id(char *id);
-nodeType *con(int value,typeEnum type);
+nodeType *con(int value,typeStruct* type);
 void freeNode(nodeType *p);
 #endif
 

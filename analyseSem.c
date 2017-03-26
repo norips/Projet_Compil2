@@ -6,9 +6,23 @@
 #include "utils/tools.h"
 #include "utils/enum.h"
 
+int testType(typeStruct *l, typeStruct *r) {
+	while(l != NULL && r != NULL) {
+		if(l->type != r->type) {
+			return -1;
+		}
+		l = l->next;
+		r = r->next;
+	}
+	if(l!=r){
+		return -1;
+	}
+	return 0;
+}
 
-int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
-	int typeL = typeNone, typeR = typeNone;
+typeStruct* analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
+	typeStruct *typeL = NULL, *typeR = NULL, *tmp = NULL;
+	typeEnum etypeL,etypeR;
 	switch(C->type) {
 		case typeCon:
 			return C->con.type;
@@ -30,15 +44,16 @@ int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 					typeL = var->_var.type;
 					break;
 				default:
-					typeL = typeNone;
+					typeL = type(typeNone);
 			}
 			return typeL;
 			break;
 		case typeOpr:
 			switch(C->opr.oper) {
 				case Af:
-					if((typeL = analyseSem(glob,loc,C->opr.op[0])) != (typeR = analyseSem(glob,loc,C->opr.op[1]))) {
-						analyseSem(glob,loc,C->opr.op[1]);
+					typeL = analyseSem(glob,loc,C->opr.op[0]);
+					typeR = analyseSem(glob,loc,C->opr.op[1]);
+					if(testType(typeL,typeR) != 0) {
 						fprintf(stderr, KRED "Near line %d \tType mismatch on affectation %s\n" KNRM,C->lineNum,C->opr.op[0]->id.id);
 						fprintf(stderr, KRED "\t%s != %s\n" KNRM,get_type(typeL),get_type(typeR));
 						exit(-1);
@@ -46,25 +61,34 @@ int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 					
 					return typeL;
 					break;
+				case Lo:
 				case Lt:
 				case Eq:
-					if((typeL = analyseSem(glob,loc,C->opr.op[0])) != (typeR = analyseSem(glob,loc,C->opr.op[1]))) {
+					typeL = analyseSem(glob,loc,C->opr.op[0]);
+					typeR = analyseSem(glob,loc,C->opr.op[1]);
+					if(testType(typeL,typeR) != 0) {
 						fprintf(stderr, KRED "Near line %d \tType mismatch on operator %s:\n" KNRM,C->lineNum,get_opr(C->opr.oper));
 						fprintf(stderr, KRED "\t%s != %s\n" KNRM,get_type(typeL),get_type(typeR));
 						exit(-1);
 					}
-					typeL = boolean;
+					typeL = type(boolean);
 					return typeL;
 					break;
 
 				case Or:
 				case And:
-					if((typeL = analyseSem(glob,loc,C->opr.op[0])) != (typeR = analyseSem(glob,loc,C->opr.op[1]))) {
+					typeL = analyseSem(glob,loc,C->opr.op[0]);
+					typeR = analyseSem(glob,loc,C->opr.op[1]);
+					tmp = typeL;
+					if(testType(typeL,typeR) != 0) {
 						fprintf(stderr, KRED "Near line %d \tType mismatch on operator %s:\n" KNRM,C->lineNum,get_opr(C->opr.oper));
 						fprintf(stderr, KRED "\t%s != %s\n" KNRM,get_type(typeL),get_type(typeR));
 						exit(-1);
 					}
-					if(typeL != boolean) {
+					while(tmp->next != NULL) {
+						tmp = tmp->next;
+					}
+					if(tmp->type != boolean) {
 						fprintf(stderr, KYEL "Near line %d \tWarning : Boolean operator %s on %s type\n" KNRM,C->lineNum,get_opr(C->opr.oper),get_type(typeL));
 					}
 					return typeL;
@@ -72,7 +96,19 @@ int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 				case Pl:
 				case Mo:
 				case Mu:
-					if((typeL = analyseSem(glob,loc,C->opr.op[0])) != (typeR = analyseSem(glob,loc,C->opr.op[1])) || typeL != integer || typeR != integer ) {
+					typeL = analyseSem(glob,loc,C->opr.op[0]);
+					typeR = analyseSem(glob,loc,C->opr.op[1]);
+					tmp = typeL;
+					while(tmp->next != NULL) {
+						tmp = tmp->next;
+					}
+					etypeL = tmp->type;
+					tmp = typeR;
+					while(tmp->next != NULL) {
+						tmp = tmp->next;
+					}
+					etypeR = tmp->type;
+					if(testType(typeL,typeR) != 0 || etypeL != integer || etypeR != integer ) {
 						fprintf(stderr, KRED "Near line %d \tType mismatch on operator %s:\n" KNRM,C->lineNum,get_opr(C->opr.oper));
 						fprintf(stderr, KRED "\t%s != %s\n" KNRM,get_type(typeL),get_type(typeR));
 						exit(-1);
@@ -120,35 +156,39 @@ int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 					return typeL;
 					break;
 				case Acc:
-					if((typeL = analyseSem(glob,loc,C->opr.op[0])) != (typeR = analyseSem(glob,loc,C->opr.op[1])) || typeL != integer || typeR != integer ) {
-						fprintf(stderr, KRED "Near line %d \tType mismatch on %s:\n" KNRM,C->lineNum,get_opr(C->opr.oper));
-						fprintf(stderr, KRED "\t%s != %s\n" KNRM,get_type(typeL),get_type(typeR));
+					typeL = analyseSem(glob,loc,C->opr.op[0]);
+					typeR = analyseSem(glob,loc,C->opr.op[1]);
+
+					if(typeR->type != integer) {
+						fprintf(stderr, KRED "Near line %d \tIndex must be an integer \n" KNRM,C->lineNum);
 						exit(-1);
 					}
-					return typeL;
+					if(typeL->type != arrOf) {
+						fprintf(stderr, KRED "Near line %d \tNot an array \n" KNRM,C->lineNum);
+						exit(-1);
+					}
+					//Real type of array
+					return typeL->next;
 					break;
 				case Aft:
-					if((typeL = analyseSem(glob,loc,C->opr.op[0])) != (typeR = analyseSem(glob,loc,C->opr.op[1])) || typeL != integer || typeR != integer ) {
-						fprintf(stderr, KRED "Near line %d \tType mismatch on %s:\n" KNRM,C->lineNum,get_opr(C->opr.oper));
+					typeL = analyseSem(glob,loc,C->opr.op[0]);
+					typeR = analyseSem(glob,loc,C->opr.op[1]);
+					
+					if(testType(typeL,typeR) != 0) {
+						fprintf(stderr, KRED "Near line %d \tWrong affection to array type \n" KNRM,C->lineNum);
 						fprintf(stderr, KRED "\t%s != %s\n" KNRM,get_type(typeL),get_type(typeR));
 						exit(-1);
+
 					}
 					return typeL;
 					break;
 				case NewAr:
 					typeL = analyseSem(glob,loc,C->opr.op[0]);
-					if( (typeR = analyseSem(glob,loc,C->opr.op[1])) != integer ) {
+					typeR = analyseSem(glob,loc,C->opr.op[1]);
+					if(typeR->type != integer) {
 						fprintf(stderr, KRED "Near line %d \tArray size need to be an integer on %s:\n" KNRM,C->lineNum,get_opr(C->opr.oper));
 						fprintf(stderr, KRED "\t%s != %s\n" KNRM,get_type(typeL),get_type(typeR));
 						exit(-1);
-					}
-					switch(typeL) {
-						case integer:
-							typeL = arrInt;
-							break;
-						case boolean:
-							typeL = arrBool;
-							break;
 					}
 					return typeL;
 					break;
@@ -156,7 +196,7 @@ int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 				case Wh:
 					//Test if first condition is boolean type
 					typeL = analyseSem(glob,loc,C->opr.op[0]);
-					if(typeL != boolean) {
+					if(typeL->type != boolean) {
 						fprintf(stderr, KRED "Near line %d \tCondition is not a boolean:\n" KNRM,C->lineNum);
 						exit(-1);
 					}
@@ -164,8 +204,14 @@ int analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 					if(C->opr.oper == If) {
 						analyseSem(glob,loc,C->opr.op[2]);
 					}
-					typeL = typeVoid;
+					typeL = type(typeVoid);
 					return typeL;
+				case Not:
+					typeL = analyseSem(glob,loc,C->opr.op[0]);
+					if(typeL->type != boolean) {
+						fprintf(stderr, KRED "Near line %d \tNot operator on not a boolean:\n" KNRM,C->lineNum);
+						exit(-1);
+					}
 			}
 	}
 	return typeL;
@@ -214,6 +260,7 @@ int ex(argType *glob,symbolTag* table,nodeType* C){
 	return 1;
 }
 int main() {
+	//yydebug = 1;
 	return yyparse();
 }
 

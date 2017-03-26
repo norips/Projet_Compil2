@@ -14,53 +14,60 @@ void print_env(argType *glob,symbolTag* table) {
   print_table(&table);
 }
 
-char *get_type(int type) {
+char *get_type(typeStruct *type) {
 	char *message = NULL;
-	switch(type) {
-		case typeCon:
-			message = "typeCon";
-			break;
-		case typeId:
-			message = "typeId";
-			break;
-		case typeOpr:
-			message = "typeOpr";
-			break;
-		case typeVar:
-			message = "typeVar";
-			break;
-		case typeFun:
-			message = "typeFun";
-			break;
-		case typePro:
-			message = "typePro";
-			break;
-		case typeArr:
-			message = "typeArr";
-			break;
-		case typeNone:
-			message = "typeNone";
-			break;
-		case typeVoid:
-			message = "typeVoid";
-			break;
-		case integer:
-			message = "integer";
-			break;
-		case boolean:
-			message = "boolean";
-			break;
-		case arrInt:
-			message = "arrInt";
-			break;
-		case arrBool:
-			message = "arrBool";
-			break;
-		default:
-			message = "Unknown type";
-			break;
+	char *buffer = malloc(sizeof(char)*1024);
+	while(type != NULL) {
+		switch(type->type) {
+			case typeCon:
+				strcat(buffer,"typeCon ");
+				break;
+			case typeId:
+				strcat(buffer,"typeId ");
+				break;
+			case typeOpr:
+				strcat(buffer,"typeOpr ");
+				break;
+			case typeVar:
+				strcat(buffer,"typeVar ");
+				break;
+			case typeFun:
+				strcat(buffer,"typeFun ");
+				break;
+			case typePro:
+				strcat(buffer,"typePro ");
+				break;
+			case typeArr:
+				strcat(buffer,"typeArr ");
+				break;
+			case typeNone:
+				strcat(buffer,"typeNone ");
+				break;
+			case typeVoid:
+				strcat(buffer,"typeVoid ");
+				break;
+			case integer:
+				strcat(buffer,"integer ");
+				break;
+			case boolean:
+				strcat(buffer,"boolean ");
+				break;
+			case arrInt:
+				strcat(buffer,"arrInt ");
+				break;
+			case arrBool:
+				strcat(buffer,"arrBool ");
+				break;
+			case arrOf:
+				strcat(buffer,"arrOf ");
+				break;
+			default:
+				strcat(buffer,"Unknown type ");
+				break;
+		}
+		type = type->next;
 	}
-	return message;
+	return buffer;
 
 }
 
@@ -88,7 +95,28 @@ char* get_opr(int opr) {
 		case Pl:
 			message = "Pl";
 			break;
-			
+		case Pro:
+			message = "Pro";
+			break;
+		case Fun:
+			message = "Fun";
+			break;
+		case Acc:
+			message = "Acc";
+			break;
+		case Aft:
+			message = "Aft";
+			break;
+		case NewAr:
+			message = "NewAr";
+			break;
+		case If:
+			message = "If";
+			break;
+		case Wh:
+			message = "Wh";
+			break;
+
 	}
 	return message;
 }

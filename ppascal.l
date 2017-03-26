@@ -32,6 +32,7 @@ and               {return And;}
 or                {return Or;}
 not               {return Not;}
 "<="              {return Lt;}
+"<"               {return Lo;}
 "="               {return Eq;}
 "array of"        {return T_ar;}
 "new array of"    {return NewAr;}

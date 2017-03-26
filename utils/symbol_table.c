@@ -20,7 +20,7 @@ int setID(symbolTag** hash,char *id, symbolTag* s) {
     }
     return -1;
 }
-symbolTag* fun(symbolTag** hash,char *id ,typeEnum type ,argType* args) {
+symbolTag* fun(symbolTag** hash,char *id ,typeStruct* type ,argType* args) {
     symbolTag* s = malloc(sizeof(symbolTag));
     strncpy(s->name, id,MAX_SIZE_ID);
     s->type = typeFun;
@@ -31,7 +31,7 @@ symbolTag* fun(symbolTag** hash,char *id ,typeEnum type ,argType* args) {
     }
     return s;
 }
-argType* arg(char *name, typeEnum type) {
+argType* arg(char *name, typeStruct* type) {
     argType* a = malloc(sizeof(argType));
     strncpy(a->name, name,MAX_SIZE_ID);
     a->type = type;
@@ -48,7 +48,7 @@ argType* addArg(argType *lost_head,argType *arg) {
     lost_head->next = (struct argType*) arg;
     return head;
 }
-symbolTag* var(symbolTag** hash,char *id, typeEnum type) {
+symbolTag* var(symbolTag** hash,char *id, typeStruct* type) {
     symbolTag* s = malloc(sizeof(symbolTag));
     strncpy(s->name, id,MAX_SIZE_ID);
     s->type = typeVar;
@@ -59,8 +59,25 @@ symbolTag* var(symbolTag** hash,char *id, typeEnum type) {
     return s;
 }
 
+typeStruct* type(typeEnum type) {
+    typeStruct* t = malloc(sizeof(typeStruct));
+    t->type = type;
+    t->next = NULL;
+    return t;
+
+}
+typeStruct* addType(typeStruct *lost_head,typeStruct* type) {
+    typeStruct *head = lost_head;
+    while(lost_head->next != NULL) {
+        lost_head = (typeStruct*) lost_head->next;
+    }
+    lost_head->next = (struct typeStruct*) type;
+    return head;
+}
+
+
 void print_table(symbolTag** hash) {
-    symbolTag *s,*tmp;
+   /* symbolTag *s,*tmp;
     HASH_ITER(hh,*hash, s, tmp) {
         if(s->type == typeVar) {
             printf("Var : %s, type : %s\n",s->name,s->_var.type == integer ? "Integer" : "Boolean");
@@ -73,5 +90,5 @@ void print_table(symbolTag** hash) {
             }
             printf("]\n");
         }
-    }
+    }*/
 }
