@@ -67,4 +67,3 @@ void freeNode(nodeType *p) {
     }
     free (p);
 }
-

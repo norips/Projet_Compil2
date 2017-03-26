@@ -37,5 +37,6 @@ nodeType *opr(int line,int oper, int nops, ...);
 nodeType *id(char *id);
 nodeType *con(int value,typeEnum type);
 void freeNode(nodeType *p);
+
 #endif
 

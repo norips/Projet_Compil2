@@ -9,14 +9,14 @@ all : $(OBJS)
 %.c: %.y
 %.c: %.l
 
-ppascal: ppascal.o ppascal.yy.o ppascal.tab.o utils/symbol_table.o utils/AST.o utils/tools.o
+ppascal: ppascal.o ppascal.yy.o ppascal.tab.o utils/symbol_table.o utils/AST.o utils/tools.o utils/print_program.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 
 ppascal.o: ppascal.c ppascal.tab.h
 
 
-ppascal.tab.c ppascal.tab.h: ppascal.y
+ppascal.tab.c ppascal.tab.h: ppascal.y utils/symbol_table.h utils/AST.h utils/enum.h
 	bison -t -v -d --output ppascal.tab.c ppascal.y
 
 
@@ -43,6 +43,7 @@ utils/AST.o: utils/AST.c utils/AST.h
 
 utils/symbol_table.o : utils/symbol_table.c utils/symbol_table.h
 
+utils/print_program.o : utils/print_program.c utils/print_program.h ppascal.tab.h utils/enum.h utils/symbol_table.h
 
 test_symbole: test_symbole.c utils/symbol_table.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)

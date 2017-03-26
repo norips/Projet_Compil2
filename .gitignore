@@ -1,1 +1,10 @@
+*~
+
 *.o
+analyseSem
+ppascal
+ppascal.output
+ppascal.tab.c
+ppascal.tab.h
+ppascal.yy.c
+test_symbole

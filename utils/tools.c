@@ -10,7 +10,7 @@ void print_env(argType *glob,symbolTag* table) {
     printf("(%s,%s)\n",current->name,current->type == integer ? "Integer" : "Boolean");
     current=(argType*)current->next;
   }
-  printf("Function definition :\n");
+  printf("\nFunction definition :\n");
   print_table(&table);
 }
 

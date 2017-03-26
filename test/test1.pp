@@ -20,11 +20,19 @@ defpro setRes(x:integer) {
 	res := x
 }
 
-defun equal(x:integer,y:integer) : boolean {
+defun equal(x:integer,y:integer) : boolean
+        var local1 : integer,
+        var local2 : boolean
+{
+        local1 := 1 + 2;
+        local2 := true or false;
+
 	equal := x=y
 }
+
 a:=2;
 arr:=new array of integer[a];
+arr[0] := 42;
 sum:=3;
 setRes(a);
 b := equal(res,a) and true;
