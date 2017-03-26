@@ -136,7 +136,7 @@ typeStruct* analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 
 					argType *arg = fun->_fun.args;
 					while(arg != NULL && param != NULL ) {
-						if(analyseSem(glob,loc,param->opr.op[0]) != arg->type) {
+						if(testType(analyseSem(glob,loc,param->opr.op[0]),arg->type) != 0) {
 							fprintf(stderr, KRED "Near line %d \tType mismatch on parameters %s in %s call:\n" KNRM,C->lineNum,arg->name,C->opr.op[0]->id.id);
 							fprintf(stderr, KRED "\t%s != %s\n" KNRM,get_type(typeL),get_type(typeR));
 							exit(-1);
