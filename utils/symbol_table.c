@@ -77,15 +77,15 @@ typeStruct* addType(typeStruct *lost_head,typeStruct* type) {
 
 
 void print_table(symbolTag** hash) {
-   /* symbolTag *s,*tmp;
+    symbolTag *s,*tmp;
     HASH_ITER(hh,*hash, s, tmp) {
         if(s->type == typeVar) {
-            printf("Var : %s, type : %s\n",s->name,s->_var.type == integer ? "Integer" : "Boolean");
+            printf("Var : %s, type : %s\n",s->name,s->_var.type->type == integer ? "Integer" : "Boolean");
         } else if(s->type == typeFun) {
-            printf("Fun : %s, type : %s,[",s->name,s->_fun.type == integer ? "Integer" : "Boolean");
+            printf("Fun : %s, type : %s,[",s->name,s->_fun.type->type == integer ? "Integer" : "Boolean");
             argType *a = s->_fun.args;
             while(a!=NULL) {
-                printf("(%s,%s),",a->name,a->type == integer ? "Integer" : "Boolean");
+                printf("(%s,%s),",a->name, a->type->type == integer ? "Integer" : "Boolean");
                 a=(argType*)a->next;
             }
             printf("]");
@@ -93,10 +93,10 @@ void print_table(symbolTag** hash) {
             argType * local = s->_fun.local;
             while(local != NULL)
             {
-               printf("\n   local var: (%s,%s)", local->name, local->type == integer ? "Integer" : "Boolean");
+               printf("\n   local var: (%s,%s)", local->name, local->type->type == integer ? "Integer" : "Boolean");
                local = (argType*) local->next;
             }
             printf("\n");
         }
-    }*/
+    }
 }

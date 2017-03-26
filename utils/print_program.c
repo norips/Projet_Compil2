@@ -15,11 +15,11 @@ void printNode(nodeType * node)
    {
       /* Constant */
       
-      if (node->con.type == integer)
+      if ((node->con.type->type) == integer)
       {
          printf("%d", node->con.value);
       }
-      else if (node->con.type == boolean)
+      else if (node->con.type->type == boolean)
       {
          if (node->con.value)
             printf("true");
@@ -75,9 +75,9 @@ void printNode(nodeType * node)
             
          case NewAr:
             printf("new array of ");
-            if (op[0].con.type == integer)
+            if (op[0].con.type->type == integer)
                printf("integer ");
-            else if (op[0].con.type == boolean)
+            else if (op[0].con.type->type == boolean)
                printf("boolean ");
             else
                error("invalid array type");
