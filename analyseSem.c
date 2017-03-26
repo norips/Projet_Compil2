@@ -11,8 +11,8 @@ int testType(typeStruct *l, typeStruct *r) {
 		if(l->type != r->type) {
 			return -1;
 		}
-		l = l->next;
-		r = r->next;
+		l =(typeStruct*) l->next;
+		r =(typeStruct*) r->next;
 	}
 	if(l!=r){
 		return -1;
@@ -86,7 +86,7 @@ typeStruct* analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 						exit(-1);
 					}
 					while(tmp->next != NULL) {
-						tmp = tmp->next;
+						tmp = (typeStruct*) tmp->next;
 					}
 					if(tmp->type != boolean) {
 						fprintf(stderr, KYEL "Near line %d \tWarning : Boolean operator %s on %s type\n" KNRM,C->lineNum,get_opr(C->opr.oper),get_type(typeL));
@@ -100,12 +100,12 @@ typeStruct* analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 					typeR = analyseSem(glob,loc,C->opr.op[1]);
 					tmp = typeL;
 					while(tmp->next != NULL) {
-						tmp = tmp->next;
+						tmp = (typeStruct*) tmp->next;
 					}
 					etypeL = tmp->type;
 					tmp = typeR;
 					while(tmp->next != NULL) {
-						tmp = tmp->next;
+						tmp = (typeStruct*) tmp->next;
 					}
 					etypeR = tmp->type;
 					if(testType(typeL,typeR) != 0 || etypeL != integer || etypeR != integer ) {
@@ -168,7 +168,7 @@ typeStruct* analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 						exit(-1);
 					}
 					//Real type of array
-					return typeL->next;
+					return (typeStruct*) typeL->next;
 					break;
 				case Aft:
 					typeL = analyseSem(glob,loc,C->opr.op[0]);

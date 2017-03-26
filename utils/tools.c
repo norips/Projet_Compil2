@@ -7,7 +7,7 @@ void print_env(argType *glob,symbolTag* table) {
   printf("Global var :\n");
   argType *current = glob;
   while(current!=NULL) {
-    printf("(%s,%s)\n",current->name,current->type == integer ? "Integer" : "Boolean");
+    printf("(%s,%s)\n",current->name,get_type(current->type));
     current=(argType*)current->next;
   }
   printf("Function definition :\n");
@@ -15,48 +15,14 @@ void print_env(argType *glob,symbolTag* table) {
 }
 
 char *get_type(typeStruct *type) {
-	char *message = NULL;
 	char *buffer = malloc(sizeof(char)*1024);
 	while(type != NULL) {
 		switch(type->type) {
-			case typeCon:
-				strcat(buffer,"typeCon ");
-				break;
-			case typeId:
-				strcat(buffer,"typeId ");
-				break;
-			case typeOpr:
-				strcat(buffer,"typeOpr ");
-				break;
-			case typeVar:
-				strcat(buffer,"typeVar ");
-				break;
-			case typeFun:
-				strcat(buffer,"typeFun ");
-				break;
-			case typePro:
-				strcat(buffer,"typePro ");
-				break;
-			case typeArr:
-				strcat(buffer,"typeArr ");
-				break;
-			case typeNone:
-				strcat(buffer,"typeNone ");
-				break;
-			case typeVoid:
-				strcat(buffer,"typeVoid ");
-				break;
 			case integer:
 				strcat(buffer,"integer ");
 				break;
 			case boolean:
 				strcat(buffer,"boolean ");
-				break;
-			case arrInt:
-				strcat(buffer,"arrInt ");
-				break;
-			case arrBool:
-				strcat(buffer,"arrBool ");
 				break;
 			case arrOf:
 				strcat(buffer,"arrOf ");
@@ -65,7 +31,7 @@ char *get_type(typeStruct *type) {
 				strcat(buffer,"Unknown type ");
 				break;
 		}
-		type = type->next;
+		type = (typeStruct*) type->next;
 	}
 	return buffer;
 
