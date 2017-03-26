@@ -34,7 +34,7 @@ analyseSem: analyseSem.o ppascal.yy.o ppascal.tab.o utils/symbol_table.o utils/A
 
 ppascal.tab.o: ppascal.tab.c ppascal.tab.h 
 
-utils/tools.o: utils/tools.c
+utils/tools.o: utils/tools.c utils/tools.h ppascal.tab.h
 
 ppascal.yy.o: ppascal.yy.c ppascal.tab.h 
 
@@ -46,7 +46,7 @@ utils/symbol_table.o : utils/symbol_table.c utils/symbol_table.h
 
 utils/print_program.o : utils/print_program.c utils/print_program.h ppascal.tab.h utils/enum.h utils/symbol_table.h
 
-test_symbole: test_symbole.c utils/symbol_table.o
+test_symbole: test_symbole.c utils/symbol_table.o utils/tools.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 test: analyseSem

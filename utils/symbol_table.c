@@ -4,6 +4,7 @@
 #include "uthash.h"
 #include "symbol_table.h"
 #include "enum.h"
+#include "tools.h"
 
 
 symbolTag* getID(symbolTag** hash,char *id) {
@@ -80,12 +81,12 @@ void print_table(symbolTag** hash) {
     symbolTag *s,*tmp;
     HASH_ITER(hh,*hash, s, tmp) {
         if(s->type == typeVar) {
-            printf("Var : %s, type : %s\n",s->name,s->_var.type->type == integer ? "Integer" : "Boolean");
+            printf("Var : %s, type : %s\n",s->name,get_type(s->_var.type));
         } else if(s->type == typeFun) {
-            printf("Fun : %s, type : %s,[",s->name,s->_fun.type->type == integer ? "Integer" : "Boolean");
+            printf("Fun : %s, type : %s,[",s->name,get_type(s->_fun.type));
             argType *a = s->_fun.args;
             while(a!=NULL) {
-                printf("(%s,%s),",a->name, a->type->type == integer ? "Integer" : "Boolean");
+                printf("(%s,%s),",a->name, get_type(a->type));
                 a=(argType*)a->next;
             }
             printf("]");
@@ -93,7 +94,7 @@ void print_table(symbolTag** hash) {
             argType * local = s->_fun.local;
             while(local != NULL)
             {
-               printf("\n   local var: (%s,%s)", local->name, local->type->type == integer ? "Integer" : "Boolean");
+               printf("\n   local var: (%s,%s)", local->name, get_type(local->type));
                local = (argType*) local->next;
             }
             printf("\n");
