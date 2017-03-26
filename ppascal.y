@@ -36,10 +36,11 @@ extern void ex(argType *glob,symbolTag* table,nodeType* C);
 %token T_ar NewAr T_boo T_int Def Dep Af true false Sk Se If Th El Var Wh Do
 %token Eq Lt Lo
 %token Not And Or Pl Mo Mu
-%nonassoc Eq Lt
+%nonassoc Eq Lt Lo
 %left Or And                    
 %left Pl Mo                    
-%left Mu                    
+%left Mu
+                    
 %right Not   
 %type<argH> Argt L_argt L_argtnn L_vart L_vartnn
 %type<typeS> TP T_boo T_int T_ar

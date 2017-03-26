@@ -56,4 +56,4 @@ test: analyseSem
 
 clean:
 	rm -f *.o *.output *.yy.c *.tab.* $(OBJS)
-	rm -f utils/*.o utils/*.tab.*
+	rm -f utils/*.o utils/*.tab.* test/*.sem
