@@ -3,13 +3,14 @@
 
 #include "print_program.h"
 
-#include "enum.h"
 #include "symbol_table.h"
+#include "enum.h"
+#include "tools.h"
 #include "../ppascal.tab.h"
 
 void printNode(nodeType * node)
 {
-   printf("\n### DEBUG ### printNode() node type: %d\n", node->type);
+   printf("\n### DEBUG ### printNode() node type: %s\n", get_opr(node->type));
    
    if (node->type == typeCon)
    {
@@ -39,9 +40,9 @@ void printNode(nodeType * node)
    {
       /* Operator */
 
-      nodeType * op = *node->opr.op;
+      nodeType * op = node->opr.op[0];
 
-      printf("### DEBUG ### operator type: %d\n", node->opr.oper);
+      printf("### DEBUG ### operator type: %s\n", get_opr(node->opr.oper));
       
       switch (node->opr.oper)
       {

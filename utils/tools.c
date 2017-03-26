@@ -1,7 +1,9 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "tools.h"
 #include "../ppascal.tab.h"
-#include <stdio.h>
 
 void print_env(argType *glob,symbolTag* table) {
   printf("Global var :\n");
@@ -38,50 +40,78 @@ char *get_type(typeStruct *type) {
 }
 
 char* get_opr(int opr) {
-	char *message = NULL;
+	char *message = malloc(sizeof(char)*1024);
+	message[0] = '\0';
 	switch(opr) {
+		case L:
+			return ("L");
+			
+		case Sk:
+			return ("Sk");
+			
+		case Af:
+			return ("Af");
+			
+		case Se:
+			return ("Se");
+			
 		case Mo:
-			message = "Mo";
-			break;
+			return ("Mo");
+			
 		case Mu:
-			message = "Mu";
-			break;
+			return ("Mu");
+			
 		case Or:
-			message = "Or";
-			break;
+			return ("Or");
+			
 		case Lt:
-			message = "Lt";
-			break;
+			return ("Lt");
+			
+		case Lo:
+			return ("Lo");
+			
 		case Eq:
-			message = "Eq";
-			break;
+			return ("Eq");
+			
 		case And:
-			message = "And";
-			break;	
+			return ("And");
+				
 		case Pl:
-			message = "Pl";
-			break;
+			return ("Pl");
+			
 		case Pro:
-			message = "Pro";
-			break;
+			return ("Pro");
+			
 		case Fun:
-			message = "Fun";
-			break;
+			return ("Fun");
+			
 		case Acc:
-			message = "Acc";
-			break;
+			return ("Acc");
+			
 		case Aft:
-			message = "Aft";
-			break;
+			return ("Aft");
+			
 		case NewAr:
-			message = "NewAr";
-			break;
+			return ("NewAr");
+			
 		case If:
-			message = "If";
-			break;
+			return ("If");
+			
 		case Wh:
-			message = "Wh";
-			break;
+			return ("Wh");
+			
+		case typeCon:
+			return ("Constant");
+			
+		case typeId:
+			return ("Identifier");
+			
+		case typeOpr:
+			return ("Operator");
+			
+		default:
+			return ("Unknown op");
+			
 
 	}
 	return message;
