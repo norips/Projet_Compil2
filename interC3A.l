@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
             elem = elem->SUIV;
         }            
         /***Pl Mu Mo***/
-        else if (elem->OP == Pl || elem->OP == Mu || elem->OP == Mo) {
+        else if (elem->OP == Pl || elem->OP == Mu || elem->OP == Mo || elem->OP == And || elem->OP == Or) {
             initenv(&env, elem->RES);
             initenv(&env, elem->ARG1);
             initenv(&env, elem->ARG2);
