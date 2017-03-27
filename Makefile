@@ -60,7 +60,7 @@ utils/AST.o: utils/AST.c utils/AST.h
 
 utils/symbol_table.o : utils/symbol_table.c utils/symbol_table.h
 
-utils/print_program.o : utils/print_program.c utils/print_program.h ppascal.tab.h utils/enum.h utils/symbol_table.h
+utils/print_program.o : utils/print_program.c utils/print_program.h ppascal.tab.h utils/enum.h utils/symbol_table.h utils/tools.h utils/AST.h utils/uthash.h
 
 test_symbole: test_symbole.c utils/symbol_table.o utils/tools.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)

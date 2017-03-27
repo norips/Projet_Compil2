@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include "utils/symbol_table.h"
 #include "utils/AST.h"
@@ -6,16 +7,19 @@
 #include "utils/tools.h"
 #include "utils/print_program.h"
 
-int ex(argType *glob,symbolTag* table,nodeType* C){
-	print_env(glob,table);
+int ex(argType *glob,symbolTag* table,nodeType* C)
+{
+   //print_env(glob,table);
 
-        printf("\nProgram:\n");
-        printNode(C);
+   //printf("\n### PRINTING PROGRAM ###\n");
+   printProgram(glob, table, C);
         
-	return 1;
+   return EXIT_SUCCESS;
 }
-int main() {
-	return yyparse();
+
+int main()
+{
+   return yyparse();
 }
 
 

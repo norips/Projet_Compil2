@@ -32,6 +32,7 @@ defun equal(x:integer,y:integer) : boolean
 
 a:=2;
 arr:=new array of integer[a];
+arr:=new array of integer[42];
 arr[0] := 42;
 sum:=3;
 setRes(a);

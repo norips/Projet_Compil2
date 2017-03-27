@@ -18,6 +18,7 @@ void print_env(argType *glob,symbolTag* table) {
 
 char *get_type(typeStruct *type) {
 	char *buffer = malloc(sizeof(char)*1024);
+        buffer[0] = '\0';
 	while(type != NULL) {
 		switch(type->type) {
 			case integer:
@@ -27,7 +28,7 @@ char *get_type(typeStruct *type) {
 				strcat(buffer,"boolean ");
 				break;
 			case arrOf:
-				strcat(buffer,"arrOf ");
+                                strcat(buffer,"array of ");
 				break;
 			default:
 				strcat(buffer,"Unknown type ");
