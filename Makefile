@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS = -Wall -g
 LDFLAGS = -ll
-OBJS= test_symbole ppascal analyseSem compPP
+OBJS= test_symbole ppascal analyseSem compPP interC3A
 TEST = $(wildcard test/*.pp)
 .PHONY: clean test
 
@@ -10,6 +10,14 @@ all : $(OBJS)
 %.c: %.y
 %.c: %.l
 
+
+interC3A.yy.c: interC3A.l
+	flex -o $@ $< 
+	
+
+interC3A: interC3A.yy.c utils/bilquad.o utils/environ_c3a.o
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+	
 ppascal: ppascal.o ppascal.yy.o ppascal.tab.o utils/symbol_table.o utils/AST.o utils/tools.o utils/print_program.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
@@ -39,6 +47,10 @@ compPP : compPP.o ppascal.yy.o ppascal.tab.o utils/symbol_table.o utils/AST.o ut
 ppascal.tab.o: ppascal.tab.c ppascal.tab.h 
 
 utils/tools.o: utils/tools.c utils/tools.h ppascal.tab.h
+
+utils/bilquad.o: utils/bilquad.c utils/bilquad.h
+
+utils/environ_C3A.o: utils/environ_C3A.c utils/environ.h
 
 ppascal.yy.o: ppascal.yy.c ppascal.tab.h 
 
