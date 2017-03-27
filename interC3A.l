@@ -81,36 +81,32 @@ char *cpa(char *src){
                         }
 [ \t\n]                 ;
 %%
-int main(int argc, char *argv[]) {
-    yylex();
-    ENV env = Envalloc();
-    QUAD elem = list.debut;
-    while (elem != NULL) {
-        /***Afc***/
-        switch(elem->OP) {
+
+void rec(ENV env,ENV loc,ENV envParam,QUAD elem) {
+    switch(elem->OP) {
             case Afc: ;
-                initenv(&env, elem->RES);
+                initenv(env, elem->RES);
                 affect(env, elem->RES, atoi(elem->ARG1));
-                elem = elem->SUIV;
+                rec(env,loc,envParam,elem->SUIV);
                 break;    
             case Pl:
             case Mu:
             case Mo:
             case And:
             case Or: ;
-                initenv(&env, elem->RES);
-                initenv(&env, elem->ARG1);
-                initenv(&env, elem->ARG2);
+                initenv(env, elem->RES);
+                initenv(env, elem->ARG1);
+                initenv(env, elem->ARG2);
                 int res = eval(elem->OP, valch(env, elem->ARG1), valch(env, elem->ARG2));
                 affect(env, elem->RES, res);
-                elem = elem->SUIV;
+                rec(env,loc,envParam,elem->SUIV);
                 break;
             /***Af***/
             case Af:;
-                initenv(&env, elem->ARG1);
-                initenv(&env, elem->ARG2);
+                initenv(env, elem->ARG1);
+                initenv(env, elem->ARG2);
                 affect(env, elem->ARG1, valch(env, elem->ARG2));
-                elem = elem->SUIV;
+                rec(env,loc,envParam,elem->SUIV);
                 break;
                         
             /***Jp***/
@@ -119,7 +115,7 @@ int main(int argc, char *argv[]) {
                 char *dest = elem->RES;
                 while (strcmp(listStart->ETIQ,dest) != 0)
                     listStart = listStart->SUIV;
-                elem=listStart;
+                rec(env,loc,envParam,listStart);
                 break;
             /***Je***/
             case Jz:;
@@ -129,23 +125,35 @@ int main(int argc, char *argv[]) {
                     while (strcmp(listStart->ETIQ,dest) != 0){
                         listStart = listStart->SUIV;
                     }
-                    elem=listStart;
+                    rec(env,loc,envParam,listStart);
                 }else{
-                    elem = elem->SUIV;
+                    rec(env,loc,envParam,elem->SUIV);
                 }
                 break;
             case St:
                 break;
             case Sk:
-                elem = elem->SUIV;
+                rec(env,loc,envParam,elem->SUIV);
                 break;
+            case Param:
+                initenv(envParam, elem->ARG1);
+                affect(envParam, elem->ARG1, valch(env, elem->ARG2));
+                break;
+            case Call:
+                dest = elem->ARG1;
+                int nb_arg = atoi(elem->ARG2);
+                for(int i = 0; i < nb_arg;i++) {
+                        ;
+                }
         }
-        if(elem->OP == St){
-            break;
-        }
+}
 
-    }
-
+int main(int argc, char *argv[]) {
+    yylex();
+    ENV env = Envalloc();
+    ENV envParam = Envalloc();
+    QUAD elem = list.debut;
+    rec(env,NULL,envParam,elem);
     ecrire_env(env);
 
 

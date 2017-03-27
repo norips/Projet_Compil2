@@ -14,7 +14,10 @@ char *Idalloc()
 }
 ENV Envalloc()
 {
-  return((ENV)malloc(sizeof(struct cellenv)));
+  ENV env = (ENV)malloc(sizeof(struct cellenv));
+  env->SUIV = NULL;
+  env->VAL = 0;
+  return env;
 }
 
 /*-------------------------------------------------------------------*/
@@ -22,17 +25,20 @@ ENV Envalloc()
 
 /* initialise l'environnement *prho par  var=0    */
 /* la chaine var est copiee dans l' environnement */
-int initenv(ENV *prho,char *var)
+int initenv(ENV prho,char *var)
 {ENV pos, newcell;
-  pos=rech(var,*prho);/* adresse de la cellule contenant var */
+  pos=rech(var,prho);/* adresse de la cellule contenant var */
   if (pos == NULL)
     /*on insere var en tete de envrnt*/
     { newcell=Envalloc();
       newcell->ID=Idalloc();
       strcpy(newcell->ID,var);
       newcell->VAL=0;
-      newcell->SUIV=*prho;
-      *prho=newcell;
+      newcell->SUIV=NULL;
+      while(prho->SUIV != NULL) {
+        prho = prho->SUIV;
+      }
+      prho->SUIV = newcell;
       return (EXIT_SUCCESS);
     }
   else
