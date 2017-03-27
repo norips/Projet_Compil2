@@ -1,0 +1,4 @@
+ET0	:Afc	:0	:	:X
+ET1	:Afc	:1	:	:Y
+ET2	:Or     :X  :Y  :Z
+ET2	:And     :X  :Y  :W
