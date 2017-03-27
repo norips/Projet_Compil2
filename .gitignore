@@ -3,6 +3,7 @@
 *.sem
 *.o
 analyseSem
+compPP
 ppascal
 ppascal.output
 ppascal.tab.c
