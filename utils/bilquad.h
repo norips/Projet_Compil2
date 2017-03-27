@@ -9,7 +9,14 @@
 #define Sk 262
 #define Jp 263
 #define Jz 264
-#define St 265 
+#define St 265
+#define And 266
+#define Or 267
+#define Not 268
+#define AfInd 269
+#define Param 270
+#define Call 271
+#define Ret 272
 /* ----------------------------types--------------------------------------------*/
 /* biliste de quadruplets etiquetes (stocke C3A ou Y86 )*/
 typedef struct cellquad{

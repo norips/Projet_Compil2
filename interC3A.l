@@ -16,7 +16,7 @@ char *cpa(char *src){
 %s OPE ARG_1 ARG_2 DEST
 %%
 
-(JMP|ET)[0-9]+                {
+[A-Za-z]+[0-9]+                {
                             BEGIN OPE; free(etiq); etiq=cpa(yytext); 
                         }
 <OPE>:[A-Za-z]+         {
@@ -39,7 +39,21 @@ char *cpa(char *src){
                                 op = Jz;   
                             } else if (strncmp("St",yytext+1,2)==0) { 
                                 op = St;   
-                            }              
+                            } else if (strncmp("And",yytext+1,3)==0) { 
+                                op = And;   
+                            } else if (strncmp("Or",yytext+1,2)==0) { 
+                                op = Or;   
+                            } else if (strncmp("Not",yytext+1,2)==0) { 
+                                op = Not;   
+                            } else if (strncmp("AfInd",yytext+1,5)==0) { 
+                                op = AfInd;   
+                            } else if (strncmp("Param",yytext+1,5)==0) { 
+                                op = Param;   
+                            } else if (strncmp("Call",yytext+1,4)==0) { 
+                                op = Call;   
+                            } else if (strncmp("Ret",yytext+1,3)==0) {
+                                op = Ret;
+                            }             
                         }
 <ARG_1>:[A-Za-z0-9]*      {
                             BEGIN ARG_2;
