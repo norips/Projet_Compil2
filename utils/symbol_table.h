@@ -12,7 +12,7 @@ typedef struct {
 } varType;
 
 
-typedef struct {
+typedef struct argType {
     typeStruct* type;
     char name[MAX_SIZE_ID];
     struct argType* next;
