@@ -8,5 +8,5 @@ ppascal
 ppascal.output
 ppascal.tab.c
 ppascal.tab.h
-ppascal.yy.c
+*.yy.c
 test_symbole

@@ -5,10 +5,11 @@
 #include "utils/symbol_table.h"
 #include "ppascal.tab.h"
 
-int line = 1;
+int line = 0;
 %}
 %option noinput nounput
 %s NFON NPRO
+%x comment
 %%
 [0-9]+            {yylval.i = atoi(yytext);return I;}
 boolean           {return T_boo;}
@@ -37,10 +38,14 @@ not               {return Not;}
 "="               {return Eq;}
 "array of"        {return T_ar;}
 "new array of"    {return NewAr;}
-
+"/*"			  {BEGIN comment;}
 <NFON>[A-Za-z0-9]+ {BEGIN INITIAL; yylval.id = strdup(yytext); return NFon;}
 <NPRO>[A-Za-z0-9]+ {BEGIN INITIAL; yylval.id = strdup(yytext); return NPro;}
 
+<comment>[^*\n]*        /* eat anything that's not a '*' */
+<comment>"*"+[^*/\n]*   /* eat up '*'s not followed by '/'s */
+<comment>\n             ++line;
+<comment>"*/"        BEGIN(INITIAL);
 [A-Za-z0-9]+      {yylval.id = strdup(yytext);return V;}
 [ \t]           {;} //Ignore
 [\n]			{line++;}

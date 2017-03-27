@@ -3,7 +3,7 @@ var a:integer, var b:boolean, var res:integer, var arr:array of integer
 defun sum(x:integer,y:integer) : integer {
 	sum := x + y
 }
-
+/* Fibo recursif */
 defun fibo(n:integer) : integer {
 	if n=0 then {
 		fibo:=0
