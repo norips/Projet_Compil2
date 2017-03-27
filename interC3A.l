@@ -87,52 +87,63 @@ int main(int argc, char *argv[]) {
     QUAD elem = list.debut;
     while (elem != NULL) {
         /***Afc***/
-        if (elem->OP == Afc) {
-            initenv(&env, elem->RES);
-            affect(env, elem->RES, atoi(elem->ARG1));
-            elem = elem->SUIV;
-        }            
-        /***Pl Mu Mo***/
-        else if (elem->OP == Pl || elem->OP == Mu || elem->OP == Mo || elem->OP == And || elem->OP == Or) {
-            initenv(&env, elem->RES);
-            initenv(&env, elem->ARG1);
-            initenv(&env, elem->ARG2);
-            int res = eval(elem->OP, valch(env, elem->ARG1), valch(env, elem->ARG2));
-            affect(env, elem->RES, res);
-            elem = elem->SUIV;
-        }            
-        /***Af***/
-        else if (elem->OP == Af) {
-            initenv(&env, elem->ARG1);
-            initenv(&env, elem->ARG2);
-            affect(env, elem->ARG1, valch(env, elem->ARG2));
-            elem = elem->SUIV;
-        }            
-        /***Jp***/
-        else if (elem->OP == Jp) {
-            QUAD listStart = list.debut;
-            char *dest = elem->RES;
-            while (strcmp(listStart->ETIQ,dest) != 0)
-                listStart = listStart->SUIV;
-            elem=listStart;
-        }            
-        /***Je***/
-        else if (elem->OP == Jz) {
-            QUAD listStart = list.debut;
-            char *dest = elem->RES;
-            if(valch(env, elem->ARG1) == 0){
-                while (strcmp(listStart->ETIQ,dest) != 0){
-                    listStart = listStart->SUIV;
-                }
-                elem=listStart;
-            }else{
+        switch(elem->OP) {
+            case Afc: ;
+                initenv(&env, elem->RES);
+                affect(env, elem->RES, atoi(elem->ARG1));
                 elem = elem->SUIV;
-            }
-        } else if (elem->OP == St){
-            break;
-        } else if (elem->OP == Sk){
-            elem = elem->SUIV;
+                break;    
+            case Pl:
+            case Mu:
+            case Mo:
+            case And:
+            case Or: ;
+                initenv(&env, elem->RES);
+                initenv(&env, elem->ARG1);
+                initenv(&env, elem->ARG2);
+                int res = eval(elem->OP, valch(env, elem->ARG1), valch(env, elem->ARG2));
+                affect(env, elem->RES, res);
+                elem = elem->SUIV;
+                break;
+            /***Af***/
+            case Af:;
+                initenv(&env, elem->ARG1);
+                initenv(&env, elem->ARG2);
+                affect(env, elem->ARG1, valch(env, elem->ARG2));
+                elem = elem->SUIV;
+                break;
+                        
+            /***Jp***/
+            case Jp:;
+                QUAD listStart = list.debut;
+                char *dest = elem->RES;
+                while (strcmp(listStart->ETIQ,dest) != 0)
+                    listStart = listStart->SUIV;
+                elem=listStart;
+                break;
+            /***Je***/
+            case Jz:;
+                listStart = list.debut;
+                dest = elem->RES;
+                if(valch(env, elem->ARG1) == 0){
+                    while (strcmp(listStart->ETIQ,dest) != 0){
+                        listStart = listStart->SUIV;
+                    }
+                    elem=listStart;
+                }else{
+                    elem = elem->SUIV;
+                }
+                break;
+            case St:
+                break;
+            case Sk:
+                elem = elem->SUIV;
+                break;
         }
+        if(elem->OP == St){
+            break;
+        }
+
     }
 
     ecrire_env(env);
