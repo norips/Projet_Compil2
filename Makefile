@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS = -Wall -g
 LDFLAGS = -ll
-OBJS= test_symbole ppascal analyseSem
+OBJS= test_symbole ppascal analyseSem compPP
 TEST = $(wildcard test/*.pp)
 .PHONY: clean test
 
@@ -31,6 +31,10 @@ analyseSem.o : analyseSem.c analyseSem.h ppascal.tab.h
 analyseSem: analyseSem.o ppascal.yy.o ppascal.tab.o utils/symbol_table.o utils/AST.o utils/tools.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
+compPP.o : compPP.c compPP.h ppascal.tab.h
+
+compPP : compPP.o ppascal.yy.o ppascal.tab.o utils/symbol_table.o utils/AST.o utils/tools.o
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 ppascal.tab.o: ppascal.tab.c ppascal.tab.h 
 
