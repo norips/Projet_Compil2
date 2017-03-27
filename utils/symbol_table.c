@@ -42,7 +42,6 @@ argType* arg(char *name, typeStruct* type) {
 }
 argType* addArg(argType *lost_head,argType *arg) {
     argType *head = lost_head;
-    arg->next = NULL;
     while(lost_head->next != NULL) {
         lost_head = (argType*) lost_head->next;
     }
