@@ -2,6 +2,8 @@
 #include "utils/bilquad.h"
 #include "utils/environ.h"
 #include <string.h>
+
+#define STACK_SIZE 1024
 BILQUAD list;
 char *etiq=NULL,*arg1=NULL,*arg2=NULL,*res=NULL;
 int op = 0;
@@ -27,6 +29,8 @@ char *cpa(char *src){
                                 op = Mo;   
                             } else if (strncmp("Mu",yytext+1,2)==0) { 
                                 op = Mu;   
+                            } else if (strncmp("AfInd",yytext+1,5)==0) { 
+                                op = AfInd;   
                             } else if (strncmp("Afc",yytext+1,3)==0) { 
                                 op = Afc;   
                             } else if (strncmp("Af",yytext+1,2)==0) { 
@@ -45,15 +49,15 @@ char *cpa(char *src){
                                 op = Or;   
                             } else if (strncmp("Not",yytext+1,2)==0) { 
                                 op = Not;   
-                            } else if (strncmp("AfInd",yytext+1,5)==0) { 
-                                op = AfInd;   
                             } else if (strncmp("Param",yytext+1,5)==0) { 
                                 op = Param;   
                             } else if (strncmp("Call",yytext+1,4)==0) { 
                                 op = Call;   
                             } else if (strncmp("Ret",yytext+1,3)==0) {
                                 op = Ret;
-                            }             
+                            } else if (strncmp("Ind",yytext+1,5)==0) { 
+                                op = Ind;   
+                            }           
                         }
 <ARG_1>:[A-Za-z0-9]*      {
                             BEGIN ARG_2;
@@ -117,6 +121,13 @@ int valchGoodEnv(ENV *env,ENV *loc,char* ID) {
     return VAL;
 }
 int stop = 0;
+int TAS[STACK_SIZE];
+
+void print_tas(int *array,int n) {
+    for(int i = 0; i < STACK_SIZE && i < n; i++) {
+        fprintf(stderr,"TAS[%d]=%d\n",i,array[i]);
+    }
+}
 void rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem) {
     if(elem == NULL || stop) return;
     fprintf(stderr,"ETQ = %s\n",elem->ETIQ);
@@ -214,6 +225,21 @@ void rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem) {
             case Ret:
                 break;
 
+            case AfInd: ;
+                int add = valch(*env, elem->ARG1);
+                int ind = valch(*env, elem->ARG2);
+                int val = valch(*env, elem->RES);
+                TAS[add+ind] = val;
+                rec(env,loc,envParam,elem->SUIV);
+                break;
+            case Ind: ;
+                add = valch(*env, elem->ARG1);
+                ind = valch(*env, elem->ARG2);
+                initenv(env,elem->RES);
+                affect(*env, elem->RES,TAS[add+ind]);
+                rec(env,loc,envParam,elem->SUIV);
+                break;
+
         }
 }
 
@@ -224,6 +250,8 @@ int main(int argc, char *argv[]) {
     QUAD elem = list.debut;
     rec(&env,NULL,&envP,elem);
     ecrire_env(env);
+    int n = valch(env,"TAS");
+    print_tas(TAS,n);
 
 
 }
