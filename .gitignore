@@ -4,6 +4,7 @@
 *.o
 analyseSem
 compPP
+interC3A
 ppascal
 ppascal.output
 ppascal.tab.c
