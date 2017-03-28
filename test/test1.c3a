@@ -1,4 +1,16 @@
 ET0	:Afc	:0	:	:X
 ET1	:Afc	:1	:	:Y
 ET2	:Or     :X  :Y  :Z
-ET2	:And     :X  :Y  :W
+ET3	:And     :X  :Y  :W
+ET4 :Sk     :   :   :
+ET5 :Sk     :   :   :
+ET6 :Sk     :   :   :
+ET7 :Afc	:10	:	:TEMP
+ET8 :Param	:PARAM1	:TEMP	:
+ET9	:Call	:SETX	:1	:
+ET10	:Afc	:1	:	:TEMP
+ET11	:Pl		:X	:TEMP	:X
+ET12	:St	:	:	:
+SETX :Sk	:	:	:
+SETX1 :Af	:X	:PARAM1	:
+SETX2 :Ret	:	:	:

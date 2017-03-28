@@ -16,7 +16,7 @@ char *cpa(char *src){
 %s OPE ARG_1 ARG_2 DEST
 %%
 
-[A-Za-z]+[0-9]+                {
+[A-Za-z]+[0-9]*                {
                             BEGIN OPE; free(etiq); etiq=cpa(yytext); 
                         }
 <OPE>:[A-Za-z]+         {
@@ -82,11 +82,52 @@ char *cpa(char *src){
 [ \t\n]                 ;
 %%
 
-void rec(ENV env,ENV loc,ENV envParam,QUAD elem) {
+void affectGoodEnv(ENV *env,ENV *loc,char* ID, int val) {
+    if(rech(ID,*loc) == NULL) {
+        //Not in global env
+        if(rech(ID,*env) == NULL) {
+            //Add it to localEnv
+            initenv(loc,ID);
+            affect(*loc, ID, val);   
+        } else {
+            //Global var
+            affect(*env, ID, val);
+        }
+    } else { //In local env
+        affect(*loc, ID, val);
+    }
+}
+
+int valchGoodEnv(ENV *env,ENV *loc,char* ID) {
+    int VAL = 0;
+    //Not in local env
+    if(rech(ID,*loc) == NULL) {
+        //Not in global env
+        if(rech(ID,*env) == NULL) {
+            //Add it to localEnv
+            fprintf(stderr,"Error\n");
+            exit(-1);
+        } else {
+            //Global var
+            VAL = valch(*env, ID);
+        }
+    } else { //In local env
+        VAL = valch(*loc, ID);
+    }
+    return VAL;
+}
+int stop = 0;
+void rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem) {
+    if(elem == NULL || stop) return;
+    fprintf(stderr,"ETQ = %s\n",elem->ETIQ);
     switch(elem->OP) {
             case Afc: ;
-                initenv(env, elem->RES);
-                affect(env, elem->RES, atoi(elem->ARG1));
+                if(loc != NULL) {
+                    affectGoodEnv(env,loc,elem->RES,atoi(elem->ARG1));
+                } else {
+                    initenv(env, elem->RES);
+                    affect(*env,elem->RES,atoi(elem->ARG1));
+                }
                 rec(env,loc,envParam,elem->SUIV);
                 break;    
             case Pl:
@@ -94,18 +135,29 @@ void rec(ENV env,ENV loc,ENV envParam,QUAD elem) {
             case Mo:
             case And:
             case Or: ;
-                initenv(env, elem->RES);
-                initenv(env, elem->ARG1);
-                initenv(env, elem->ARG2);
-                int res = eval(elem->OP, valch(env, elem->ARG1), valch(env, elem->ARG2));
-                affect(env, elem->RES, res);
+                if(loc != NULL) {
+                    int arg1 = valchGoodEnv(env,loc,elem->ARG1);
+                    int arg2 = valchGoodEnv(env,loc,elem->ARG2);
+                    affectGoodEnv(env,loc,elem->RES,eval(elem->OP,arg1,arg2));
+                } else {
+                    initenv(env, elem->RES);
+                    initenv(env, elem->ARG1);
+                    initenv(env, elem->ARG2);
+                    int res = eval(elem->OP, valch(*env, elem->ARG1), valch(*env, elem->ARG2));
+                    affect(*env, elem->RES, res);       
+                }
                 rec(env,loc,envParam,elem->SUIV);
                 break;
             /***Af***/
             case Af:;
-                initenv(env, elem->ARG1);
-                initenv(env, elem->ARG2);
-                affect(env, elem->ARG1, valch(env, elem->ARG2));
+                if(loc != NULL) {
+                    int VAL = valchGoodEnv(env,loc,elem->ARG2);
+                    affectGoodEnv(env,loc,elem->ARG1,VAL);
+                } else {
+                    initenv(env, elem->ARG1);
+                    initenv(env, elem->ARG2);
+                    affect(*env, elem->ARG1, valch(*env, elem->ARG2));
+                }
                 rec(env,loc,envParam,elem->SUIV);
                 break;
                         
@@ -121,7 +173,7 @@ void rec(ENV env,ENV loc,ENV envParam,QUAD elem) {
             case Jz:;
                 listStart = list.debut;
                 dest = elem->RES;
-                if(valch(env, elem->ARG1) == 0){
+                if(valch(*env, elem->ARG1) == 0){
                     while (strcmp(listStart->ETIQ,dest) != 0){
                         listStart = listStart->SUIV;
                     }
@@ -131,29 +183,46 @@ void rec(ENV env,ENV loc,ENV envParam,QUAD elem) {
                 }
                 break;
             case St:
+                stop = 1;
                 break;
             case Sk:
                 rec(env,loc,envParam,elem->SUIV);
                 break;
+                //Pass local var as Param
             case Param:
                 initenv(envParam, elem->ARG1);
-                affect(envParam, elem->ARG1, valch(env, elem->ARG2));
+                affect(*envParam, elem->ARG1, valch(*env, elem->ARG2));
+                rec(env,loc,envParam,elem->SUIV);
                 break;
             case Call:
                 dest = elem->ARG1;
                 int nb_arg = atoi(elem->ARG2);
+                ENV localEnv = *envParam;
                 for(int i = 0; i < nb_arg;i++) {
-                        ;
+                        *envParam = (*envParam)->SUIV;
                 }
+
+                listStart = list.debut;
+                while (strcmp(listStart->ETIQ,dest) != 0){
+                        listStart = listStart->SUIV;
+                }
+
+                ENV newParamEnv = Envalloc();
+                rec(env,&localEnv,&newParamEnv,listStart);
+                rec(env,loc,envParam,elem->SUIV);
+                break;
+            case Ret:
+                break;
+
         }
 }
 
 int main(int argc, char *argv[]) {
     yylex();
     ENV env = Envalloc();
-    ENV envParam = Envalloc();
+    ENV envP = Envalloc();
     QUAD elem = list.debut;
-    rec(env,NULL,envParam,elem);
+    rec(&env,NULL,&envP,elem);
     ecrire_env(env);
 
 
