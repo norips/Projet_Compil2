@@ -18,7 +18,7 @@ interC3A.yy.c: interC3A.l
 interC3A: interC3A.yy.c utils/bilquad.o utils/environ_c3a.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 	
-ppascal: ppascal.o ppascal.yy.o ppascal.tab.o utils/symbol_table.o utils/AST.o utils/tools.o utils/print_program.o
+ppascal: ppascal.o ppascal.yy.o ppascal.tab.o utils/symbol_table.o utils/AST.o utils/tools.o utils/print_program.o utils/env.o utils/heap.o utils/stack.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 
@@ -61,6 +61,12 @@ utils/AST.o: utils/AST.c utils/AST.h
 utils/symbol_table.o : utils/symbol_table.c utils/symbol_table.h
 
 utils/print_program.o : utils/print_program.c utils/print_program.h ppascal.tab.h utils/enum.h utils/symbol_table.h utils/tools.h utils/AST.h utils/uthash.h
+
+utils/env.o : utils/env.h utils/heap.h utils/env.c
+
+utils/heap.o : utils/heap.h utils/stack.h utils/env.h utils/heap.c
+
+utils/stack.o : utils/stack.h utils/env.h utils/stack.c
 
 test_symbole: test_symbole.c utils/symbol_table.o utils/tools.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
