@@ -253,8 +253,7 @@ void printNode(nodeType * node, int indentation)
 
             printf("\n");
             indent(indentation);
-            printf("}\n");
-            indent(indentation);
+            printf("}");
             break;
             
          case Wh:
@@ -270,8 +269,7 @@ void printNode(nodeType * node, int indentation)
 
             printf("\n");
             indent(indentation);
-            printf("}\n");
-            indent(indentation);
+            printf("}");
             break;
             
          case Se:

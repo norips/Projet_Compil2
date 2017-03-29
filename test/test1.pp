@@ -27,7 +27,10 @@ defun equal(x:integer,y:integer) : boolean
         local1 := 1 + 2;
         local2 := true or false;
 
-	equal := x=y
+	equal := x=y;
+
+        x := 42;
+        local1 := true
 }
 
 a:=2;
