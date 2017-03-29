@@ -67,6 +67,7 @@ test_symbole: test_symbole.c utils/symbol_table.o utils/tools.o
 
 test: analyseSem
 	for test in $(TEST); do \
+		echo "Fichier :" $$test; \
 		./analyseSem < $$test > $$test.sem;\
 	done
 	
