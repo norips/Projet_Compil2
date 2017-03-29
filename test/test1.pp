@@ -29,17 +29,24 @@ defun equal(x:integer,y:integer) : boolean
 
 	equal := x=y;
 
-        x := 42;
-        local1 := true
+        x := 42
 }
 
 a:=2;
 arr:=new array of integer[a];
 arr:=new array of integer[42];
 arr[0] := 42;
-sum:=3;
 setRes(a);
 b := equal(res,a) and true;
 a := 1 and 1;
-res:=fibo(5);
-equal(res,a)
+res:=fibo(5)
+
+
+
+
+/* Failing
+sum := 2;
+equal(true,2);
+a := setRes(2)
+*/
+

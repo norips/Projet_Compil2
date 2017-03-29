@@ -39,6 +39,7 @@ typeStruct* analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 
 			var->used=1;
 			switch(var->type) {
+				case typePro:
 				case typeFun:
 					typeL = var->_fun.type;
 					break;
@@ -52,8 +53,21 @@ typeStruct* analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 			break;
 		case typeOpr:
 			switch(C->opr.oper) {
-				case Af:
+				case Af: ;
+					symbolTag *var = getID(&loc,C->opr.op[0]->id.id);
+					if(var == NULL) {
+						var = getID(&glob,C->opr.op[0]->id.id);
+						if(var == NULL) {
+							fprintf(stderr, KRED "Near line %d \tUndefined %s\n" KNRM,C->opr.op[0]->lineNum,C->opr.op[0]->id.id);
+							exit(-1);
+						}
+					}
+					if(var->type == typeFun || var->type == typePro) {
+						fprintf(stderr, KRED "Near line %d \tAffect on a function %s\n" KNRM,C->lineNum,C->opr.op[0]->id.id);
+						exit(-1);
+					}
 					typeL = analyseSem(glob,loc,C->opr.op[0]);
+
 					typeR = analyseSem(glob,loc,C->opr.op[1]);
 					if(testType(typeL,typeR) != 0) {
 						fprintf(stderr, KRED "Near line %d \tType mismatch on affectation %s\n" KNRM,C->lineNum,C->opr.op[0]->id.id);
@@ -140,7 +154,7 @@ typeStruct* analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 					while(arg != NULL && param != NULL ) {
 						if(testType(analyseSem(glob,loc,param->opr.op[0]),arg->type) != 0) {
 							fprintf(stderr, KRED "Near line %d \tType mismatch on parameters %s in %s call:\n" KNRM,C->lineNum,arg->name,C->opr.op[0]->id.id);
-							fprintf(stderr, KRED "\t%s != %s\n" KNRM,get_type(typeL),get_type(typeR));
+							fprintf(stderr, KRED "\t%s != %s\n" KNRM,get_type(typeL),get_type(arg->type));
 							exit(-1);
 						}
 						param = param->opr.op[1];

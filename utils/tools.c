@@ -28,7 +28,10 @@ char *get_type(typeStruct *type) {
 				strcat(buffer,"boolean ");
 				break;
 			case arrOf:
-                                strcat(buffer,"array of ");
+                strcat(buffer,"array of ");
+				break;
+			case typeVoid:
+                strcat(buffer,"void");
 				break;
 			default:
 				strcat(buffer,"Unknown type ");
