@@ -172,6 +172,7 @@ int ex_bis(argType *glob,symbolTag* table,nodeType* node) {
             case Aft:
                 ex_bis(glob,table,opR);
                 rightCurrent = currentC;
+                ex_bis(glob,table,opL);
                 snprintf(buf3,20,"CT%d",rightCurrent);
                 snprintf(buf,20,"TAB%d",currentT);
                 snprintf(buf2,20,"IND%d",currentT);
