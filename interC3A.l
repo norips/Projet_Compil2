@@ -226,17 +226,46 @@ void rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem) {
                 break;
 
             case AfInd: ;
-                int add = valch(*env, elem->ARG1);
-                int ind = valch(*env, elem->ARG2);
-                int val = valch(*env, elem->RES);
-                TAS[add+ind] = val;
+                if(loc != NULL) {
+                    int add = valchGoodEnv(env,loc, elem->ARG1);
+                    int ind = valchGoodEnv(env,loc, elem->ARG2);
+                    int val = valchGoodEnv(env,loc, elem->RES);
+                    if((add+ind) >= STACK_SIZE) {
+                        fprintf(stderr,"Stack Overflow\n");
+                        exit(-1);
+                    }
+                    TAS[add+ind] = val; 
+                } else {
+                    int add = valch(*env, elem->ARG1);
+                    int ind = valch(*env, elem->ARG2);
+                    int val = valch(*env, elem->RES);
+                    if((add+ind) >= STACK_SIZE) {
+                        fprintf(stderr,"Stack Overflow\n");
+                        exit(-1);
+                    }
+                    TAS[add+ind] = val; 
+                }
                 rec(env,loc,envParam,elem->SUIV);
                 break;
             case Ind: ;
-                add = valch(*env, elem->ARG1);
-                ind = valch(*env, elem->ARG2);
-                initenv(env,elem->RES);
-                affect(*env, elem->RES,TAS[add+ind]);
+                if(loc != NULL) {
+                    int add = valchGoodEnv(env,loc, elem->ARG1);
+                    int ind = valchGoodEnv(env,loc, elem->ARG2);
+                    if((add+ind) >= STACK_SIZE) {
+                        fprintf(stderr,"Stack Overflow\n");
+                        exit(-1);
+                    }
+                    affectGoodEnv(env,loc, elem->RES,TAS[add+ind]);
+                } else {
+                    int add = valch(*env, elem->ARG1);
+                    int ind = valch(*env, elem->ARG2);
+                    if((add+ind) >= STACK_SIZE) {
+                        fprintf(stderr,"Stack Overflow\n");
+                        exit(-1);
+                    }
+                    initenv(env,elem->RES);
+                    affect(*env, elem->RES,TAS[add+ind]);
+                }
                 rec(env,loc,envParam,elem->SUIV);
                 break;
 
