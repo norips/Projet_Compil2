@@ -36,6 +36,8 @@ typeStruct* analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 					exit(-1);
 				}
 			}
+
+			var->used=1;
 			switch(var->type) {
 				case typeFun:
 					typeL = var->_fun.type;
@@ -219,6 +221,7 @@ typeStruct* analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 
 void analyseFun(symbolTag* glob,symbolTag *fun) {
 	symbolTag *localSym = NULL;
+	symbolTag *s,*tmp;
 	argType *localVar = fun->_fun.local;
 	argType *params = fun->_fun.args;
 	while(localVar != NULL) {
@@ -235,11 +238,18 @@ void analyseFun(symbolTag* glob,symbolTag *fun) {
 		}
 		params = (argType*) params->next;
 	}
-	if(var(&localSym,fun->name,fun->_fun.type) == NULL) {			
-		fprintf(stderr, KRED "Local var may have the same name as function %s parameters\n" KNRM,fun->name);
-		exit(-1);
+	if(fun->type != typePro) {
+		if(var(&localSym,fun->name,fun->_fun.type) == NULL) {			
+			fprintf(stderr, KRED "Local var may have the same name as function %s parameters\n" KNRM,fun->name);
+			exit(-1);
+		}
 	}
 	analyseSem(glob,localSym,fun->_fun.corps);
+	HASH_ITER(hh,localSym, s, tmp) {
+    	if(s->type == typeVar && s->used == 0) {
+    		fprintf(stderr, KYEL "Warning : Unused var %s in a function\n" KNRM,s->name);
+    	}
+    }
 }
 
 int ex(argType *glob,symbolTag* table,nodeType* C){
@@ -257,6 +267,12 @@ int ex(argType *glob,symbolTag* table,nodeType* C){
     	}
     }
     analyseSem(table,NULL,C);
+
+    HASH_ITER(hh,table, s, tmp) {
+    	if(s->type == typeVar && s->used == 0) {
+    		fprintf(stderr, KYEL "Warning : Unused var %s\n" KNRM,s->name);
+    	}
+    }
 	return 1;
 }
 int main() {

@@ -21,6 +21,17 @@ int setID(symbolTag** hash,char *id, symbolTag* s) {
     }
     return -1;
 }
+symbolTag* pro(symbolTag** hash,char *id,typeStruct* type, argType* args) {
+    symbolTag* s = malloc(sizeof(symbolTag));
+    strncpy(s->name, id,MAX_SIZE_ID);
+    s->type = typePro;
+    s->_fun.args = args;
+    s->_fun.type = type;
+    if(setID(hash,id,s) == -1) {
+        return NULL;
+    }
+    return s;
+}
 symbolTag* fun(symbolTag** hash,char *id ,typeStruct* type ,argType* args) {
     symbolTag* s = malloc(sizeof(symbolTag));
     strncpy(s->name, id,MAX_SIZE_ID);

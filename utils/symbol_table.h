@@ -30,6 +30,7 @@ typedef struct {
 typedef struct {
     char name[MAX_SIZE_ID];
     symEnum type;              /* type of node */
+    int used;
     union {
         varType _var;        /* variale */
         funType _fun;
@@ -42,6 +43,7 @@ symbolTag* getID(symbolTag** hash,char *id);
 int setID(symbolTag** hash,char *id, symbolTag* s);
 
 symbolTag* fun(symbolTag** hash,char *id,typeStruct* type, argType* args);
+symbolTag* pro(symbolTag** hash,char *id,typeStruct* type, argType* args);
 
 argType* arg(char *name, typeStruct* type);
 
