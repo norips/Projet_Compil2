@@ -179,12 +179,19 @@ int ex_bis(argType *glob,symbolTag* table,nodeType* node) {
                 print(current++,"AfInd",buf,buf2,buf3);
                 break;
                 
+            case Not:
+                ex_bis(glob,table,opR);
+                snprintf(buf,20,"CT%d",currentC);
+                snprintf(bufVar,20,"CT%d",++currentC);
+                print(current++,"Not",buf,NULL,bufVar);
+                break;
+
+                
             case Pro:
             case Fun:
             case L:
             case Lt:
             case Lo:
-            case Not:
             default:
                 printf("invalid operator type %s",get_opr(node->opr.oper));
                 
