@@ -57,7 +57,9 @@ char *cpa(char *src){
                                 op = Ret;
                             } else if (strncmp("Ind",yytext+1,5)==0) { 
                                 op = Ind;   
-                            }           
+                            } else if (strncmp("LeTh",yytext+1,5)==0) { 
+                                op = LeTh;   
+                            }            
                         }
 <ARG_1>:[A-Za-z0-9]*      {
                             BEGIN ARG_2;
@@ -145,6 +147,7 @@ void rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem) {
             case Mu:
             case Mo:
             case And:
+            case LeTh:
             case Or: ;
                 if(loc != NULL) {
                     int arg1 = valchGoodEnv(env,loc,elem->ARG1);

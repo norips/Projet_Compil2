@@ -13,6 +13,7 @@
 #define L   802
 #define Acc 803 //Access to an array
 #define Aft 804 //Affection to an array
+#define LeTh 805
 typedef enum { typeCon = 0, typeId, typeOpr } nodeEnum;
 typedef enum { typeVar = 10, typeFun, typePro, typeArr, typeNone } symEnum;
 typedef enum { integer = 20, boolean, arrInt, arrBool, arrOf, typeVoid} typeEnum;
