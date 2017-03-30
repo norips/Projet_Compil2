@@ -276,7 +276,7 @@ int ex(argType *glob,symbolTag* table,nodeType* C){
 		glob = (argType*) glob->next;
 	}
     HASH_ITER(hh,table, s, tmp) {
-    	if(s->type == typeFun) {
+    	if(s->type == typeFun || s->type == typePro) {
     		analyseFun(table,s);
     	}
     }
