@@ -9,7 +9,7 @@
 #include "utils/environ.h"
 
 
-#define STACK_SIZE 256
+#define STACK_SIZE 1024
 static int currentC=0, current=0, currentT=0 ;
 
 void print(int etq,const char *op, const char *arg, char *arg2) {
@@ -100,7 +100,7 @@ int ex_bis(symbolTag *glob,symbolTag *loc,nodeType* node) {
                 sprintf(buf,"JMP%d",lbJMP);
                 int lbJMP1 = lbJMP++;
                 int lbJMP2 = lbJMP++;
-                print(current++,"andl","%eax","%eax");
+                //print(current++,"andl","%eax","%eax");
                 print(current++,"je",buf,NULL);
                 ex_bis(glob,loc,opR);
                 sprintf(buf,"JMP%d",lbJMP2);
@@ -113,13 +113,20 @@ int ex_bis(symbolTag *glob,symbolTag *loc,nodeType* node) {
                 break;
                 
             case Wh:
-                ex_bis(glob,loc,opL);
                 sprintf(buf,"JMP%d",lbJMP);
                 lbJMP1 = lbJMP++;
-                print(current++,"andl","%eax","%eax");
-                print(current++,"je",buf,"NULL");
+                printETQ(current,buf,"nop","",NULL);
+                ex_bis(glob,loc,opL);
+
+
+                //print(current++,"andl","%eax","%eax");
+                lbJMP2 = lbJMP++;
+                sprintf(buf,"JMP%d",lbJMP2);
+                print(current++,"je",buf,NULL);
                 ex_bis(glob,loc,opR);
                 sprintf(buf,"JMP%d",lbJMP1);
+                print(current++,"jmp",buf,NULL);
+                sprintf(buf,"JMP%d",lbJMP2);
                 printETQ(current,buf,"nop","",NULL);
                 break;
                 
@@ -130,7 +137,12 @@ int ex_bis(symbolTag *glob,symbolTag *loc,nodeType* node) {
                 
             case Eq:
                 ex_bis(glob,loc,opL);
+                print(current++,"pushl","%eax",NULL);
                 ex_bis(glob,loc,opR);
+                print(current++,"popl","%ecx",NULL);
+                print(current++,"subl","%ecx","%eax");
+                print(current++,"irmovl","0xffffffff","%ecx"); 
+                print(current++,"xorl","%ecx","%eax"); 
                 break;
  
             case NewAr:
@@ -170,16 +182,21 @@ int ex_bis(symbolTag *glob,symbolTag *loc,nodeType* node) {
                 print(current++,"pushl","%eax",NULL); //Save value
                 ex_bis(glob,loc,opL);
                 print(current++,"popl","%eax",NULL); //Save value
-                print(current++,"rmmovl","%eax","(%ecx)");
+                print(current++,"rmmovl","%eax","(%ecx) //Affect");
                 break;
                 
+            case Not:
+                ex_bis(glob,loc,opL);
+                print(current++,"irmovl","0xffffffff","%ecx"); //Save value
+                print(current++,"xorl","%ecx","%eax"); //Save value
+                break;
             case Pro:
             case Fun:
             case Lt:
             case Lo:
-            case Not:
+
             default:
-                printf("Unimplemented operator type %s",get_opr(node->opr.oper));
+                fprintf(stderr, KRED "Unimplemented operator type %s\n" KNRM,get_opr(node->opr.oper));
                 
                 
         }
@@ -232,6 +249,34 @@ void mulFunction() {
     printETQ(current++,"ENDMUL","irmovl","0","%eax");
     printETQ(current++,NULL,"ret",NULL,NULL);                                 
 }
+void ex_fun(symbolTag* glob,symbolTag *fun) {
+    symbolTag *localSym = NULL;
+    symbolTag *s,*tmp;
+    argType *localVar = fun->_fun.local;
+    argType *params = fun->_fun.args;
+    while(localVar != NULL) {
+        if(var(&localSym,localVar->name,localVar->type) == NULL) {
+            fprintf(stderr, KRED "Already defined %s in %s\n" KNRM,localVar->name,fun->name);
+            exit(-1);
+        }
+        localVar = (argType*) localVar->next;
+    }
+    while(params != NULL) {
+        if(var(&localSym,params->name,params->type) == NULL) {
+            fprintf(stderr, KRED "Already defined %s in %s parameters\n" KNRM,params->name,params->name);
+            exit(-1);
+        }
+        params = (argType*) params->next;
+    }
+    if(fun->type != typePro) {
+        if(var(&localSym,fun->name,fun->_fun.type) == NULL) {           
+            fprintf(stderr, KRED "Local var may have the same name as function %s parameters\n" KNRM,fun->name);
+            exit(-1);
+        }
+    }
+    printf("%s:\tnop\n",fun->name);
+    ex_bis(glob,localSym,fun->_fun.corps);
+}
 
 void ex(argType *glob,symbolTag* table,nodeType* p) {
     symbolTag *s,*tmp;
@@ -249,6 +294,12 @@ void ex(argType *glob,symbolTag* table,nodeType* p) {
     HASH_ITER(hh,table, s, tmp) {
         if(s->type == typeVar) {
             printf("%s:\t.long 0\n",s->name);
+        }
+    }
+    HASH_ITER(hh,table, s, tmp) {
+        if(s->type == typeFun || s->type == typePro) {
+            printf("%s:\tnop\n",s->name);
+            ex_fun(table,s);
         }
     }
     printf("\n");
