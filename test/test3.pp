@@ -1,10 +1,15 @@
 var X1 : array of integer,
-var X2 : integer
+var X2 : integer,
+var test : boolean
 
-X2:=20;
+test := false;
 X1 := new array of integer[X2];
-X1[5] := 10;
 X1[4] := 15;
-X2:=X1[5]
+X1[5] := 10;
+if test then {
+	X2:=X1[4]
+} else {
+	X2:=X1[5]
+}
 /*
 */

@@ -18,6 +18,16 @@ void print(int etq,const char *op, const char *arg, char *arg2) {
     strcat(buff,",");
     printf("ET%d:\t%s %s\t%s\t\n",etq,op,arg ? arg : "",arg2 ? strcat(buff,arg2) : "");
 }
+void printETQ(int etq,char *etq2,const char *op, const char *arg, char *arg2 ) {
+    if(etq2 == NULL) {
+        print(etq,op,arg,arg2);
+    } else {
+        char buff[128];
+        buff[0] = '\0';
+        strcat(buff,",");
+        printf("%s:\t%s %s\t%s\t\n",etq2,op,arg ? arg : "",arg2 ? strcat(buff,arg2) : "");
+    }
+}
 static int lbJMP=0;
 
 int ex_bis(symbolTag *glob,symbolTag *loc,nodeType* node) {
@@ -86,13 +96,31 @@ int ex_bis(symbolTag *glob,symbolTag *loc,nodeType* node) {
                 break;                
             case If:
                 ex_bis(glob,loc,opL);
+                char buf[20];
+                sprintf(buf,"JMP%d",lbJMP);
+                int lbJMP1 = lbJMP++;
+                int lbJMP2 = lbJMP++;
+                print(current++,"andl","%eax","%eax");
+                print(current++,"je",buf,NULL);
                 ex_bis(glob,loc,opR);
+                sprintf(buf,"JMP%d",lbJMP2);
+                print(current++,"jmp",buf,NULL);
+                sprintf(buf,"JMP%d",lbJMP1);
+                printETQ(current,buf,"nop","",NULL);
                 ex_bis(glob,loc,node->opr.op[2]);
+                sprintf(buf,"JMP%d",lbJMP2);
+                printETQ(current,buf,"nop","",NULL);
                 break;
                 
             case Wh:
                 ex_bis(glob,loc,opL);
+                sprintf(buf,"JMP%d",lbJMP);
+                lbJMP1 = lbJMP++;
+                print(current++,"andl","%eax","%eax");
+                print(current++,"je",buf,"NULL");
                 ex_bis(glob,loc,opR);
+                sprintf(buf,"JMP%d",lbJMP1);
+                printETQ(current,buf,"nop","",NULL);
                 break;
                 
             case Se:
@@ -147,7 +175,6 @@ int ex_bis(symbolTag *glob,symbolTag *loc,nodeType* node) {
                 
             case Pro:
             case Fun:
-            case L:
             case Lt:
             case Lo:
             case Not:
@@ -162,16 +189,7 @@ int ex_bis(symbolTag *glob,symbolTag *loc,nodeType* node) {
 
 }
 
-void printETQ(int etq,char *etq2,const char *op, const char *arg, char *arg2 ) {
-    if(etq2 == NULL) {
-        print(etq,op,arg,arg2);
-    } else {
-        char buff[128];
-        buff[0] = '\0';
-        strcat(buff,",");
-        printf("%s:\t%s %s\t%s\t\n",etq2,op,arg ? arg : "",arg2 ? strcat(buff,arg2) : "");
-    }
-}
+
 void mulFunction() {
     printf("MUL:\tnop\n");
     printETQ(current++,NULL,"mrmovl","4(%esp)","%eax");
