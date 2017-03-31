@@ -41,7 +41,7 @@ int ex_bis(symbolTag *glob,symbolTag *loc,nodeType* node) {
     //printf("%s\n",get_opr(node->type));
     if (node == NULL)
     {
-        printf("NULL");
+        return 0;
     }
     else if (node->type == typeCon)
     {
@@ -100,7 +100,7 @@ int ex_bis(symbolTag *glob,symbolTag *loc,nodeType* node) {
                 sprintf(buf,"JMP%d",lbJMP);
                 int lbJMP1 = lbJMP++;
                 int lbJMP2 = lbJMP++;
-                //print(current++,"andl","%eax","%eax");
+                print(current++,"andl","%eax","%eax");
                 print(current++,"je",buf,NULL);
                 ex_bis(glob,loc,opR);
                 sprintf(buf,"JMP%d",lbJMP2);
@@ -119,7 +119,7 @@ int ex_bis(symbolTag *glob,symbolTag *loc,nodeType* node) {
                 ex_bis(glob,loc,opL);
 
 
-                //print(current++,"andl","%eax","%eax");
+                print(current++,"andl","%eax","%eax");
                 lbJMP2 = lbJMP++;
                 sprintf(buf,"JMP%d",lbJMP2);
                 print(current++,"je",buf,NULL);
@@ -190,10 +190,42 @@ int ex_bis(symbolTag *glob,symbolTag *loc,nodeType* node) {
                 print(current++,"irmovl","0xffffffff","%ecx"); //Save value
                 print(current++,"xorl","%ecx","%eax"); //Save value
                 break;
+            case L:
+                ex_bis(glob,loc,opL);
+                print(current++,"pushl","%eax",NULL);
+                ex_bis(glob,loc,opR);
+                break;
+
             case Pro:
             case Fun:
+                ex_bis(glob,loc,opR);
+                sprintf(buf,"%s",opL->id.id);
+                print(current++,"call",buf,NULL); //Save value
+                nodeType *params = opR;
+                int i=0;
+                while(params != NULL) {
+                    i++;
+                    params = params->opr.op[1];
+                }
+                sprintf(buf,"%d",i*4);
+                print(current++,"iaddl",buf,"%esp"); //Save value
+                break;
             case Lt:
+                ex_bis(glob,loc,opR);
+                print(current++,"pushl","%eax",NULL);
+                ex_bis(glob,loc,opL);
+                print(current++,"pushl","%eax",NULL);
+                print(current++,"call","LOWEREQ",NULL);
+                print(current++,"iaddl","8","%esp"); //empty stack
+                break;
             case Lo:
+                ex_bis(glob,loc,opR);
+                print(current++,"pushl","%eax",NULL);
+                ex_bis(glob,loc,opL);
+                print(current++,"pushl","%eax",NULL);
+                print(current++,"call","LOWER",NULL);
+                print(current++,"iaddl","8","%esp"); //empty stack
+                break;
 
             default:
                 fprintf(stderr, KRED "Unimplemented operator type %s\n" KNRM,get_opr(node->opr.oper));
@@ -206,7 +238,31 @@ int ex_bis(symbolTag *glob,symbolTag *loc,nodeType* node) {
 
 }
 
+void lowerFunction() {
+    printf("LOWER:\tnop\n");
+    print(current++,"mrmovl","4(%esp)","%eax"); //Prem
+    print(current++,"mrmovl","8(%esp)","%ecx"); //Deux
+    print(current++,"subl","%ecx","%eax");
+    print(current++,"jl","LOW",NULL);
+    print(current++,"irmovl","0","%eax"); // arg1 >= arg2
+    print(current++,"ret","",NULL); //Deux
+    printETQ(current,"LOW","nop","",NULL);
+    print(current++,"irmovl","1","%eax"); // arg1 < arg2
+    print(current++,"ret","",NULL); //Deux
+}
+void lowerEQFunction() {
+    printf("LOWEREQ:\tnop\n");
+    print(current++,"mrmovl","4(%esp)","%eax"); //Prem
+    print(current++,"mrmovl","8(%esp)","%ecx"); //Deux
+    print(current++,"subl","%ecx","%eax");
+    print(current++,"jle","LOWEQ",NULL);
+    print(current++,"irmovl","0","%eax"); // arg1 > arg2
+    print(current++,"ret","",NULL); //Deux
+    printETQ(current,"LOWEQ","nop","",NULL);
+    print(current++,"irmovl","1","%eax"); // arg1 <= arg2
+    print(current++,"ret","",NULL); //Deux
 
+}
 void mulFunction() {
     printf("MUL:\tnop\n");
     printETQ(current++,NULL,"mrmovl","4(%esp)","%eax");
@@ -274,7 +330,7 @@ void ex_fun(symbolTag* glob,symbolTag *fun) {
             exit(-1);
         }
     }
-    printf("%s:\tnop\n",fun->name);
+    printf("\n%s:\tnop\n",fun->name);
     ex_bis(glob,localSym,fun->_fun.corps);
 }
 
@@ -296,14 +352,18 @@ void ex(argType *glob,symbolTag* table,nodeType* p) {
             printf("%s:\t.long 0\n",s->name);
         }
     }
+    printf(".align 4\n\n");
     HASH_ITER(hh,table, s, tmp) {
         if(s->type == typeFun || s->type == typePro) {
-            printf("%s:\tnop\n",s->name);
             ex_fun(table,s);
         }
     }
     printf("\n");
     mulFunction();
+    printf("\n");
+    lowerFunction();
+    printf("\n");
+    lowerEQFunction();
     printf("\n");
     printf(".pos 0x%x\n",(4*current+STACK_SIZE));
     printf("%s:\t.long 0\n","STACK");
