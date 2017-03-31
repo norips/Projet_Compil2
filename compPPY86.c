@@ -52,7 +52,22 @@ int ex_bis(symbolTag *glob,symbolTag *loc,nodeType* node) {
     }
     else if (node->type == typeId)
     {
-        print(current++,"mrmovl",node->id.id,"%eax");
+        if(loc != NULL) {
+            symbolTag *var;
+            if((var = getID(&loc,node->id.id)) == NULL) {
+                if((var = getID(&glob,node->id.id)) == NULL) {
+                    fprintf(stderr, "Error\n");
+                    exit(-1);
+                }
+                print(current++,"mrmovl",node->id.id,"%eax");
+            } else { //Is in local env
+                char buf[20];
+                sprintf(buf,"%d(%%ebp)",var->_var.posInStack);
+                print(current++,"mrmovl",buf,"%eax");
+            }
+        } else {
+            print(current++,"mrmovl",node->id.id,"%eax");
+        }
     }
     else if (node->type == typeOpr)
     {
@@ -65,7 +80,22 @@ int ex_bis(symbolTag *glob,symbolTag *loc,nodeType* node) {
         {
             case Af:
                 ex_bis(glob,loc,opR);
-                print(current++,"rmmovl","%eax",opL->id.id);
+                if(loc != NULL) {
+                    symbolTag *var;
+                    if((var = getID(&loc,opL->id.id)) == NULL) {
+                        if((var = getID(&glob,opL->id.id)) == NULL) {
+                            fprintf(stderr, "Error\n");
+                            exit(-1);
+                        }
+                        print(current++,"rmmovl","%eax",opL->id.id);
+                    } else { //Is in local env
+                        char buf[20];
+                        sprintf(buf,"%d(%%ebp)",var->_var.posInStack);
+                        print(current++,"rmmovl","%eax",buf);
+                    }
+                } else {
+                    print(current++,"rmmovl","%eax",opL->id.id);
+                }
                 break;
                 
             case Mo:
@@ -86,7 +116,7 @@ int ex_bis(symbolTag *glob,symbolTag *loc,nodeType* node) {
                         print(current++,"rrmovl","%ecx","%eax");
                         break;
                     case Or:
-                        print(current++,"orl","%ecx","%eax");
+                        print(current++,"xorl","%ecx","%eax");
                         break;
                     case And:
                         print(current++,"andl","%ecx","%eax");
@@ -139,10 +169,9 @@ int ex_bis(symbolTag *glob,symbolTag *loc,nodeType* node) {
                 ex_bis(glob,loc,opL);
                 print(current++,"pushl","%eax",NULL);
                 ex_bis(glob,loc,opR);
-                print(current++,"popl","%ecx",NULL);
-                print(current++,"subl","%ecx","%eax");
-                print(current++,"irmovl","0xffffffff","%ecx"); 
-                print(current++,"xorl","%ecx","%eax"); 
+                print(current++,"pushl","%eax",NULL);
+                print(current++,"call","EQUAL",NULL);
+                print(current++,"iaddl","8","%esp"); //empty stack
                 break;
  
             case NewAr:
@@ -250,6 +279,19 @@ void lowerFunction() {
     print(current++,"irmovl","1","%eax"); // arg1 < arg2
     print(current++,"ret","",NULL); //Deux
 }
+
+void eqFunction() {
+    printf("EQUAL:\tnop\n");
+    print(current++,"mrmovl","4(%esp)","%eax"); //Prem
+    print(current++,"mrmovl","8(%esp)","%ecx"); //Deux
+    print(current++,"xorl","%ecx","%eax");
+    print(current++,"je","EQU",NULL);
+    print(current++,"irmovl","0","%eax"); // arg1 >= arg2
+    print(current++,"ret","",NULL); //Deux
+    printETQ(current,"EQU","nop","",NULL);
+    print(current++,"irmovl","1","%eax"); // arg1 < arg2
+    print(current++,"ret","",NULL); //Deux
+}
 void lowerEQFunction() {
     printf("LOWEREQ:\tnop\n");
     print(current++,"mrmovl","4(%esp)","%eax"); //Prem
@@ -310,28 +352,58 @@ void ex_fun(symbolTag* glob,symbolTag *fun) {
     symbolTag *s,*tmp;
     argType *localVar = fun->_fun.local;
     argType *params = fun->_fun.args;
+    int n_args = 0;
+
+    printf("\n%s:\tnop\n",fun->name);
+    print(current++,"irmovl","0","%eax");
+    while(params != NULL) {
+        n_args++;
+        params = (argType*) params->next;
+    }
+    int n_vars = 0;
     while(localVar != NULL) {
-        if(var(&localSym,localVar->name,localVar->type) == NULL) {
-            fprintf(stderr, KRED "Already defined %s in %s\n" KNRM,localVar->name,fun->name);
-            exit(-1);
-        }
+        n_vars++;
         localVar = (argType*) localVar->next;
     }
+    int i=0;
+    localVar = fun->_fun.local;
+    params = fun->_fun.args;
     while(params != NULL) {
-        if(var(&localSym,params->name,params->type) == NULL) {
+        //Skip %ebp @ret
+        if(varStack(&localSym,params->name,params->type,((n_args-i)*4)+4) == NULL) {
             fprintf(stderr, KRED "Already defined %s in %s parameters\n" KNRM,params->name,params->name);
             exit(-1);
         }
         params = (argType*) params->next;
+        i++;
     }
+    i = 0;
+    print(current++,"pushl","%ebp",NULL);
+    print(current++,"rrmovl","%esp","%ebp");
     if(fun->type != typePro) {
-        if(var(&localSym,fun->name,fun->_fun.type) == NULL) {           
+        n_vars++;
+        if(varStack(&localSym,fun->name,fun->_fun.type,(n_vars-i)*-4) == NULL) {           
             fprintf(stderr, KRED "Local var may have the same name as function %s parameters\n" KNRM,fun->name);
             exit(-1);
         }
+        print(current++,"pushl","%eax",NULL);
+        i++;
     }
-    printf("\n%s:\tnop\n",fun->name);
+    while(localVar != NULL) {
+        if(varStack(&localSym,localVar->name,localVar->type,(n_vars-i)*-4) == NULL) {
+            fprintf(stderr, KRED "Already defined %s in %s\n" KNRM,localVar->name,fun->name);
+            exit(-1);
+        }
+        print(current++,"pushl","%eax",NULL);
+        localVar = (argType*) localVar->next;
+        i++;
+    }
     ex_bis(glob,localSym,fun->_fun.corps);
+    char buf[20];
+    sprintf(buf,"%d",n_vars*4);
+    print(current++,"iaddl",buf,"%esp");
+    print(current++,"popl","%ebp",NULL);
+    print(current++,"ret","",NULL);
 }
 
 void ex(argType *glob,symbolTag* table,nodeType* p) {
@@ -360,6 +432,8 @@ void ex(argType *glob,symbolTag* table,nodeType* p) {
     }
     printf("\n");
     mulFunction();
+    printf("\n");
+    eqFunction();
     printf("\n");
     lowerFunction();
     printf("\n");

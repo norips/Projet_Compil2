@@ -9,6 +9,7 @@
 /* constants */
 typedef struct {
     typeStruct *type;                  /* type of var */
+    int posInStack;
 } varType;
 
 
@@ -53,6 +54,7 @@ typeStruct *type(typeEnum type);
 typeStruct *addType(typeStruct* type, typeStruct* next);
 
 symbolTag* var(symbolTag** hash,char *id, typeStruct* type);
+symbolTag* varStack(symbolTag** hash,char *id, typeStruct* type,int pos);
 
 void print_table(symbolTag** hash);
 

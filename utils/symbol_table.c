@@ -69,6 +69,17 @@ symbolTag* var(symbolTag** hash,char *id, typeStruct* type) {
     }
     return s;
 }
+symbolTag* varStack(symbolTag** hash,char *id, typeStruct* type,int pos) {
+    symbolTag* s = malloc(sizeof(symbolTag));
+    strncpy(s->name, id,MAX_SIZE_ID);
+    s->type = typeVar;
+    s->_var.type = type;
+    s->_var.posInStack = pos;
+    if(setID(hash,id,s) == -1) {
+        return NULL;
+    }
+    return s;
+}
 
 typeStruct* type(typeEnum type) {
     typeStruct* t = malloc(sizeof(typeStruct));
