@@ -402,6 +402,10 @@ void ex_fun(symbolTag* glob,symbolTag *fun) {
     char buf[20];
     sprintf(buf,"%d",n_vars*4);
     print(current++,"iaddl",buf,"%esp");
+    if(fun->type != typePro) {
+        sprintf(buf,"%d(%%ebp)",(n_vars)*-4);
+        print(current++,"mrmovl",buf,"%eax");
+    }
     print(current++,"popl","%ebp",NULL);
     print(current++,"ret","",NULL);
 }
