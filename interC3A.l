@@ -234,7 +234,7 @@ void rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem) {
                     int ind = valchGoodEnv(env,loc, elem->ARG2);
                     int val = valchGoodEnv(env,loc, elem->RES);
                     if((add+ind) >= STACK_SIZE) {
-                        fprintf(stderr,"Stack Overflow\n");
+                        fprintf(stderr,"Heap Overflow\n");
                         exit(-1);
                     }
                     TAS[add+ind] = val; 
@@ -243,7 +243,7 @@ void rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem) {
                     int ind = valch(*env, elem->ARG2);
                     int val = valch(*env, elem->RES);
                     if((add+ind) >= STACK_SIZE) {
-                        fprintf(stderr,"Stack Overflow\n");
+                        fprintf(stderr,"Heap Overflow\n");
                         exit(-1);
                     }
                     TAS[add+ind] = val; 
@@ -255,7 +255,7 @@ void rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem) {
                     int add = valchGoodEnv(env,loc, elem->ARG1);
                     int ind = valchGoodEnv(env,loc, elem->ARG2);
                     if((add+ind) >= STACK_SIZE) {
-                        fprintf(stderr,"Stack Overflow\n");
+                        fprintf(stderr,"Heap Overflow\n");
                         exit(-1);
                     }
                     affectGoodEnv(env,loc, elem->RES,TAS[add+ind]);
@@ -263,7 +263,7 @@ void rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem) {
                     int add = valch(*env, elem->ARG1);
                     int ind = valch(*env, elem->ARG2);
                     if((add+ind) >= STACK_SIZE) {
-                        fprintf(stderr,"Stack Overflow\n");
+                        fprintf(stderr,"Heap Overflow\n");
                         exit(-1);
                     }
                     initenv(env,elem->RES);
