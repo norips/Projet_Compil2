@@ -47,7 +47,15 @@ int ex_bis(symbolTag *glob,symbolTag *loc,nodeType* node) {
     {
         char buf[20];
         snprintf(buf,20,"%d",node->con.value);
-        print(current++,"irmovl",buf,"%eax");
+        if(node->con.type->type == boolean) {
+            if(node->con.value) {
+                print(current++,"irmovl","0xffffffff","%eax");
+            } else {
+                print(current++,"irmovl","0","%eax");
+            }
+        } else {
+            print(current++,"irmovl",buf,"%eax");
+        }
         
     }
     else if (node->type == typeId)
@@ -115,8 +123,20 @@ int ex_bis(symbolTag *glob,symbolTag *loc,nodeType* node) {
                         print(current++,"subl","%eax","%ecx");
                         print(current++,"rrmovl","%ecx","%eax");
                         break;
-                    case Or:
-                        print(current++,"xorl","%ecx","%eax");
+                    case Or: // P | Q = !(!P & !Q)
+                        print(current++,"pushl","%ecx",NULL); //Save Q
+                        print(current++,"irmovl","0xffffffff","%ecx"); 
+                        print(current++,"xorl","%ecx","%eax"); // %eax = !P
+
+                        print(current++,"popl","%ecx",NULL); // Q
+                        print(current++,"pushl","%eax",NULL); //Save !P
+                        print(current++,"rrmovl","%ecx","%eax");
+                        print(current++,"irmovl","0xffffffff","%ecx"); 
+                        print(current++,"xorl","%ecx","%eax"); // %eax = !Q
+                        print(current++,"popl","%ecx",NULL); // !P
+                        print(current++,"andl","%ecx","%eax"); // !P & !Q
+                        print(current++,"irmovl","0xffffffff","%ecx"); 
+                        print(current++,"xorl","%ecx","%eax"); // !(!P & !Q)
                         break;
                     case And:
                         print(current++,"andl","%ecx","%eax");
