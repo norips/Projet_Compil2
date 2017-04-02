@@ -296,7 +296,7 @@ void lowerFunction() {
     print(current++,"irmovl","0","%eax"); // arg1 >= arg2
     print(current++,"ret","",NULL); //Deux
     printETQ(current,"LOW","nop","",NULL);
-    print(current++,"irmovl","1","%eax"); // arg1 < arg2
+    print(current++,"irmovl","0xffffffff","%eax"); // arg1 < arg2
     print(current++,"ret","",NULL); //Deux
 }
 
@@ -309,7 +309,7 @@ void eqFunction() {
     print(current++,"irmovl","0","%eax"); // arg1 >= arg2
     print(current++,"ret","",NULL); //Deux
     printETQ(current,"EQU","nop","",NULL);
-    print(current++,"irmovl","1","%eax"); // arg1 < arg2
+    print(current++,"irmovl","0xffffffff","%eax"); // arg1 < arg2
     print(current++,"ret","",NULL); //Deux
 }
 void lowerEQFunction() {
@@ -321,7 +321,7 @@ void lowerEQFunction() {
     print(current++,"irmovl","0","%eax"); // arg1 > arg2
     print(current++,"ret","",NULL); //Deux
     printETQ(current,"LOWEQ","nop","",NULL);
-    print(current++,"irmovl","1","%eax"); // arg1 <= arg2
+    print(current++,"irmovl","0xffffffff","%eax"); // arg1 <= arg2
     print(current++,"ret","",NULL); //Deux
 
 }
