@@ -165,22 +165,28 @@ int ex_bis(argType *glob,symbolTag* table,symbolTag* local,nodeType* node) {
 
                 break;
  
-            case NewAr:
+            case NewAr: ;
+                int currentTas = currentC;
+                snprintf(buf,20,"CT%d",currentC++);
+                print(current++,"Af",buf,"TAS",NULL);
                 ex_bis(glob,table,local,opR);
                 snprintf(buf,20,"CT%d",currentC);
-                print(current++,"Pl","TAS", buf, "TAS" );
+                print(current++,"Pl","TAS", buf, "TAS");
+                snprintf(buf2,20,"CT%d",currentTas);
+                print(current++,"Af",buf,buf2,NULL);
+
                 break;
                 
             case Acc:
                 ex_bis(glob,table,local,opL);
                 leftCurrent = currentC;
-                snprintf(buf,20,"TAB%d",currentT);
+                snprintf(buf,20,"TAB%d",++currentT);
                 snprintf(buf2,20,"CT%d",leftCurrent);
                 print(current++,"Af",buf, buf2, NULL);
                 
                 ex_bis(glob,table,local,opR);
                 rightCurrent = currentC;
-                snprintf(buf3,20,"IND%d",currentT++);
+                snprintf(buf3,20,"IND%d",currentT);
                 snprintf(buf4,20,"CT%d",rightCurrent);
                 print(current++,"Af",buf3, buf4, NULL);
         
@@ -255,11 +261,18 @@ int ex_bis(argType *glob,symbolTag* table,symbolTag* local,nodeType* node) {
 
 
 void ex(argType *glob,symbolTag* table,nodeType* p) {
+    symbolTag *s,*tmp;
     print(current++,"Afc", "0", NULL, "TAS");
     print(current++,"Afc", "0", NULL, "RETFUN");
+
+    argType* varGlob = glob;
+    while(varGlob != NULL) {
+            print(current++,"Af",varGlob->name,"0","");
+            varGlob = varGlob->next;
+    }
     int res = ex_bis(glob,table,NULL,p);
     print(current++,"St",NULL,NULL,NULL);
-    symbolTag *s,*tmp;
+
     HASH_ITER(hh,table, s, tmp) {
         if(s->type == typeFun || s->type == typePro) {
             printf("\n");
