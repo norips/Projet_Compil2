@@ -7,6 +7,7 @@
 #include "utils/tools.h"
 #include "utils/enum.h"
 #include "utils/environ.h"
+#include "utils/symbol_table.h"
 
 static int currentC=0, current=0, currentT=0 ;
 
@@ -15,7 +16,7 @@ void print(int etq,const char *op, const char *arg, const char *arg2, const char
 }
 static int lbJMP=0;
 
-int ex_bis(argType *glob,symbolTag* table,nodeType* node) {
+int ex_bis(argType *glob,symbolTag* table,symbolTag* local,nodeType* node) {
     int lbJMP1,lbJMP2,leftCurrent=0, rightCurrent =0;
     char buf[20];
     char buf2[20];
@@ -51,15 +52,23 @@ int ex_bis(argType *glob,symbolTag* table,nodeType* node) {
         switch (node->opr.oper)
         {
             case Af:
-                ex_bis(glob,table,opR);
+                ex_bis(glob,table,local,opR);
                 snprintf(buf,20,"CT%d",currentC);
-                print(current++,"Af",opL->id.id, buf,NULL );
+                if(local != NULL ) {
+                    if(getID(&local,opL->id.id) != NULL) {
+                        if(getID(&local,opL->id.id)->_var.type->type == typeVoid) {
+                            print(current++,"Af","RETFUN", buf,NULL );
+                        }
+                    }
+                } else {
+                    print(current++,"Af",opL->id.id, buf,NULL );
+                }
                 break;
                 
             case Pl:
-                ex_bis(glob,table,opL);
+                ex_bis(glob,table,local,opL);
                 leftCurrent = currentC;
-                ex_bis(glob,table,opR);
+                ex_bis(glob,table,local,opR);
                 snprintf(buf,20,"CT%d",leftCurrent);
                 snprintf(buf2,20,"CT%d",currentC);
                 snprintf(bufVar,20,"CT%d",++currentC);
@@ -67,9 +76,9 @@ int ex_bis(argType *glob,symbolTag* table,nodeType* node) {
                 break;
                 
             case Mo:
-                ex_bis(glob,table,opL);
+                ex_bis(glob,table,local,opL);
                 leftCurrent = currentC;
-                ex_bis(glob,table,opR);
+                ex_bis(glob,table,local,opR);
                 snprintf(buf,20,"CT%d",leftCurrent);
                 snprintf(buf2,20,"CT%d",currentC);
                 snprintf(bufVar,20,"CT%d",++currentC);
@@ -77,9 +86,9 @@ int ex_bis(argType *glob,symbolTag* table,nodeType* node) {
                 break;
             
             case Mu:
-                ex_bis(glob,table,opL);
+                ex_bis(glob,table,local,opL);
                 leftCurrent = currentC;
-                ex_bis(glob,table,opR);
+                ex_bis(glob,table,local,opR);
                 snprintf(buf,20,"CT%d",leftCurrent);
                 snprintf(buf2,20,"CT%d",currentC);
                 snprintf(bufVar,20,"CT%d",++currentC);
@@ -87,9 +96,9 @@ int ex_bis(argType *glob,symbolTag* table,nodeType* node) {
                 break;
 
             case Or:
-                ex_bis(glob,table,opL);
+                ex_bis(glob,table,local,opL);
                 leftCurrent = currentC;
-                ex_bis(glob,table,opR);
+                ex_bis(glob,table,local,opR);
                 snprintf(buf,20,"CT%d",leftCurrent);
                 snprintf(buf2,20,"CT%d",currentC);
                 snprintf(bufVar,20,"CT%d",++currentC);
@@ -97,9 +106,9 @@ int ex_bis(argType *glob,symbolTag* table,nodeType* node) {
                 break;
                 
             case And:
-                ex_bis(glob,table,opL);
+                ex_bis(glob,table,local,opL);
                 leftCurrent = currentC;
-                ex_bis(glob,table,opR);
+                ex_bis(glob,table,local,opR);
                 snprintf(buf,20,"CT%d",leftCurrent);
                 snprintf(buf2,20,"CT%d",currentC);
                 snprintf(bufVar,20,"CT%d",++currentC);
@@ -107,39 +116,39 @@ int ex_bis(argType *glob,symbolTag* table,nodeType* node) {
                 break;
                 
             case If:
-                ex_bis(glob,table,opL);
+                ex_bis(glob,table,local,opL);
                 snprintf(buf,20,"CT%d",currentC);
                 snprintf(buf2,20,"JMP%d",lbJMP1 = lbJMP++);
                 print(current++,"Jz",buf,NULL,buf2);
-                ex_bis(glob,table,opR);
+                ex_bis(glob,table,local,opR);
                 snprintf(buf3,20,"JMP%d",lbJMP2 = lbJMP++);
                 print(current++,"Jp",NULL,NULL,buf3);
                 printf("%s\t:%s\t:%s\t:%s\t:%s\n",buf2,"Sk","","","");
-                ex_bis(glob,table,node->opr.op[2]);
+                ex_bis(glob,table,local,node->opr.op[2]);
                 printf("%s\t:%s\t:%s\t:%s\t:%s\n",buf3,"Sk","","","");
                 break;
                 
             case Wh:
                 snprintf(buf,20,"JMP%d",lbJMP1 = lbJMP++);
                 printf("%s\t:%s\t:%s\t:%s\t:%s\n",buf,"Sk","","","");
-                ex_bis(glob,table,opL);
+                ex_bis(glob,table,local,opL);
                 snprintf(buf2,20,"CT%d",currentC);
                 snprintf(buf3,20,"JMP%d",lbJMP2 = lbJMP++);
                 print(current++,"Jz",buf2,NULL,buf3);
-                ex_bis(glob,table,opR);
+                ex_bis(glob,table,local,opR);
                 print(current++,"Jp",NULL,NULL,buf);
                 printf("%s\t:%s\t:%s\t:%s\t:%s\n",buf3,"Sk","","","");
                 break;
                 
             case Se:
-                ex_bis(glob,table,opL);
-                ex_bis(glob,table,opR);
+                ex_bis(glob,table,local,opL);
+                ex_bis(glob,table,local,opR);
                 break;
                 
             case Eq:
-                ex_bis(glob,table,opL);
+                ex_bis(glob,table,local,opL);
                 leftCurrent = currentC;
-                ex_bis(glob,table,opR);
+                ex_bis(glob,table,local,opR);
                 snprintf(buf,20,"CT%d",leftCurrent);
                 snprintf(buf2,20,"CT%d",currentC);
                 snprintf(bufVar,20,"CT%d",++currentC);
@@ -147,19 +156,19 @@ int ex_bis(argType *glob,symbolTag* table,nodeType* node) {
                 break;
  
             case NewAr:
-                ex_bis(glob,table,opR);
+                ex_bis(glob,table,local,opR);
                 snprintf(buf,20,"CT%d",currentC);
                 print(current++,"Pl","TAS", buf, "TAS" );
                 break;
                 
             case Acc:
-                ex_bis(glob,table,opL);
+                ex_bis(glob,table,local,opL);
                 leftCurrent = currentC;
                 snprintf(buf,20,"TAB%d",currentT);
                 snprintf(buf2,20,"CT%d",leftCurrent);
                 print(current++,"Af",buf, buf2, NULL);
                 
-                ex_bis(glob,table,opR);
+                ex_bis(glob,table,local,opR);
                 rightCurrent = currentC;
                 snprintf(buf3,20,"IND%d",currentT++);
                 snprintf(buf4,20,"CT%d",rightCurrent);
@@ -170,9 +179,9 @@ int ex_bis(argType *glob,symbolTag* table,nodeType* node) {
                 break;
                 
             case Aft:
-                ex_bis(glob,table,opR);
+                ex_bis(glob,table,local,opR);
                 rightCurrent = currentC;
-                ex_bis(glob,table,opL);
+                ex_bis(glob,table,local,opL);
                 snprintf(buf3,20,"CT%d",rightCurrent);
                 snprintf(buf,20,"TAB%d",currentT);
                 snprintf(buf2,20,"IND%d",currentT);
@@ -180,7 +189,7 @@ int ex_bis(argType *glob,symbolTag* table,nodeType* node) {
                 break;
                 
             case Not:
-                ex_bis(glob,table,opR);
+                ex_bis(glob,table,local,opR);
                 snprintf(buf,20,"CT%d",currentC);
                 snprintf(bufVar,20,"CT%d",++currentC);
                 print(current++,"Not",buf,NULL,bufVar);
@@ -188,10 +197,37 @@ int ex_bis(argType *glob,symbolTag* table,nodeType* node) {
 
                 
             case Pro:
-            case Fun:
-            case L:
+            case Fun: ;
+                char *funName = opL->id.id;
+                symbolTag* fun = getID(&table,funName);
+
+                argType *arg = fun->_fun.args;
+                while(opR != NULL) {
+                    ex_bis(glob,table,local,opR->opr.op[0]);
+                    snprintf(buf3,20,"CT%d",currentC);
+                    print(current++,"Param",arg->name,buf3,"");
+                    arg = arg->next;
+                    opR = opR->opr.op[1];
+                }
+                argType *loc = fun->_fun.local;
+                while(loc != NULL) {
+                    print(current++,"Param",loc->name,"0","");
+                    loc = loc->next;
+                }
+                print(current++,"Call",funName,"","");
+                snprintf(buf,20,"CT%d",++currentC);
+                print(current++,"Af",buf,"RETFUN","");
+                break;
             case Lt:
             case Lo:
+                ex_bis(glob,table,local,opL);
+                leftCurrent = currentC;
+                ex_bis(glob,table,local,opR);
+                snprintf(buf,20,"CT%d",leftCurrent);
+                snprintf(buf2,20,"CT%d",currentC);
+                snprintf(buf3,20,"CT%d",++currentC);
+                print(current++,"Lt",buf,buf2,buf3);
+                break;
             default:
                 printf("invalid operator type %s",get_opr(node->opr.oper));
                 
@@ -206,8 +242,21 @@ int ex_bis(argType *glob,symbolTag* table,nodeType* node) {
 
 void ex(argType *glob,symbolTag* table,nodeType* p) {
     print(current++,"Afc", "0", NULL, "TAS");
-    int res = ex_bis(glob,table,p);
+    print(current++,"Afc", "0", NULL, "RETFUN");
+    int res = ex_bis(glob,table,NULL,p);
     print(current++,"St",NULL,NULL,NULL);
+    symbolTag *s,*tmp;
+    HASH_ITER(hh,table, s, tmp) {
+        if(s->type == typeFun || s->type == typePro) {
+            symbolTag *tableLoc = NULL;
+            var(&tableLoc,s->name,type(typeVoid));
+            printf("%s\t:%s\t:%s\t:%s\t:%s\n",s->name,"Sk","","","");
+            ex_bis(glob,table,tableLoc,s->_fun.corps);
+            char buf[20];
+            snprintf(buf,20,"CT%d",currentC);
+            print(current++,"Ret","","","");
+        }
+    }
     
 }
 

@@ -223,9 +223,12 @@ void rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem) {
 
                 ENV newParamEnv = Envalloc();
                 rec(env,&localEnv,&newParamEnv,listStart);
+                
+                stop = 0;
                 rec(env,loc,envParam,elem->SUIV);
                 break;
             case Ret:
+                stop = 1;
                 break;
 
             case AfInd: ;

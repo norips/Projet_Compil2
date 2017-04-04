@@ -20,7 +20,7 @@ void printProgram(argType * global, symbolTag * functions, nodeType * main)
    symbolTag * _;
    HASH_ITER(hh, functions, function, _)
    {
-      if (function->type == typeFun)
+      if (function->type == typeFun || function->type == typePro)
          printFunction(function);
       else
          error("variable in symbol table");

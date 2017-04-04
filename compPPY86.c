@@ -141,6 +141,13 @@ int ex_bis(symbolTag *glob,symbolTag *loc,nodeType* node) {
                     case And:
                         print(current++,"andl","%ecx","%eax");
                         break;
+                    case Mu:
+                        print(current++,"pushl","%ecx",NULL);
+                        print(current++,"pushl","%eax",NULL);
+                        print(current++,"call","MUL",NULL);
+                        print(current++,"iaddl","8","%esp"); //empty stack
+
+                        break;
                 }
                 
                 break;                

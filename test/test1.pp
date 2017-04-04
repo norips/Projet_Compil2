@@ -38,7 +38,7 @@ arr:=new array of integer[42];
 arr[10] := 12;
 arr[0] := 42;
 setRes(arr[10]);
-b := equal(res,a) and true;
+b := equal(res,a) or true;
 a := 1 and 0
 /*res:=fibo(11)*/
 
