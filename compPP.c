@@ -54,11 +54,9 @@ int ex_bis(argType *glob,symbolTag* table,symbolTag* local,nodeType* node) {
             case Af:
                 ex_bis(glob,table,local,opR);
                 snprintf(buf,20,"CT%d",currentC);
-                if(local != NULL ) {
-                    if(getID(&local,opL->id.id) != NULL) {
-                        if(getID(&local,opL->id.id)->_var.type->type == typeVoid) {
-                            print(current++,"Af","RETFUN", buf,NULL );
-                        }
+                if(local != NULL && getID(&local,opL->id.id) != NULL) {
+                    if(getID(&local,opL->id.id)->_var.type->type == typeVoid) {
+                        print(current++,"Af","RETFUN", buf,NULL );
                     }
                 } else {
                     print(current++,"Af",opL->id.id, buf,NULL );
@@ -152,7 +150,19 @@ int ex_bis(argType *glob,symbolTag* table,symbolTag* local,nodeType* node) {
                 snprintf(buf,20,"CT%d",leftCurrent);
                 snprintf(buf2,20,"CT%d",currentC);
                 snprintf(bufVar,20,"CT%d",++currentC);
-                print(current++,"And",buf,buf2,bufVar);
+                print(current++,"Mo",buf,buf2,bufVar);
+                snprintf(buf3,20,"JMP%d",lbJMP1 = lbJMP++);
+                snprintf(buf4,20,"JMP%d",lbJMP2 = lbJMP++);
+                print(current++,"Jz",bufVar,NULL,buf3);
+                snprintf(bufVar,20,"CT%d",++currentC);
+                print(current++,"Afc","0", NULL,bufVar );
+                print(current++,"Jp",NULL,NULL,buf4);
+                printf("%s\t:%s\t:%s\t:%s\t:%s\n",buf3,"Sk","","","");
+                print(current++,"Afc","1",NULL ,bufVar );
+                printf("%s\t:%s\t:%s\t:%s\t:%s\n",buf4,"Sk","","","");
+
+
+
                 break;
  
             case NewAr:
@@ -202,19 +212,23 @@ int ex_bis(argType *glob,symbolTag* table,symbolTag* local,nodeType* node) {
                 symbolTag* fun = getID(&table,funName);
 
                 argType *arg = fun->_fun.args;
+                int i = 0;
                 while(opR != NULL) {
                     ex_bis(glob,table,local,opR->opr.op[0]);
                     snprintf(buf3,20,"CT%d",currentC);
                     print(current++,"Param",arg->name,buf3,"");
                     arg = arg->next;
                     opR = opR->opr.op[1];
+                    i++;
                 }
                 argType *loc = fun->_fun.local;
                 while(loc != NULL) {
                     print(current++,"Param",loc->name,"0","");
                     loc = loc->next;
+                    i++;
                 }
-                print(current++,"Call",funName,"","");
+                snprintf(buf2,20,"%d",i);
+                print(current++,"Call",funName,buf2,"");
                 snprintf(buf,20,"CT%d",++currentC);
                 print(current++,"Af",buf,"RETFUN","");
                 break;
@@ -248,6 +262,7 @@ void ex(argType *glob,symbolTag* table,nodeType* p) {
     symbolTag *s,*tmp;
     HASH_ITER(hh,table, s, tmp) {
         if(s->type == typeFun || s->type == typePro) {
+            printf("\n");
             symbolTag *tableLoc = NULL;
             var(&tableLoc,s->name,type(typeVoid));
             printf("%s\t:%s\t:%s\t:%s\t:%s\n",s->name,"Sk","","","");

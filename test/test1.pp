@@ -33,14 +33,14 @@ defun equal(x:integer,y:integer) : boolean
 }
 
 a:=2;
-arr:=new array of integer[a];
+/*arr:=new array of integer[a];
 arr:=new array of integer[42];
 arr[10] := 12;
 arr[0] := 42;
-setRes(arr[10]);
-b := equal(res,a) or true;
-a := 1 and 0
-/*res:=fibo(11)*/
+setRes(arr[10]);*/
+b := equal(2,a);
+a := 1 and 0;
+res:=fibo(11)
 
 
 

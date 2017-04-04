@@ -96,7 +96,7 @@ int ecrire_env(ENV rho)
       return(EXIT_SUCCESS);}
   else
     {
-        if(rho->ID != NULL && strncmp(rho->ID,"CT",2) !=0){
+        if(rho->ID != NULL ){
            printf("variable %s valeur %d \n",rho->ID ? rho->ID : "(null)",rho->VAL);
         }
         ecrire_env(rho->SUIV);
