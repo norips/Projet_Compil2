@@ -3,11 +3,11 @@
 
 typedef struct Stack Stack;
 
-typedef struct Var Var;
+typedef struct Variable Variable;
 typedef struct Array Array;
 typedef struct Heap Heap;
 
-struct Var
+struct Variable
 {
    int isScalar;
 
@@ -22,8 +22,8 @@ struct Array
 {
    int keepStatus;
 
-   int   size;
-   Var * items;
+   int        size;
+   Variable * items;
 
    Array * next;
 };
@@ -42,7 +42,13 @@ Array * newArrayOfArray(int size, Heap * heap);
 
 void collectGarbage(Heap * heap, Stack * roots);
 
-void printVar(Var * var);
+Variable scalar(int value);
+Variable array(Array * value);
+
+void assertScalar(Variable * var);
+void assertArray(Variable * var);
+
+void printVar(Variable * var);
 void printArray(Array * array);
 
 #endif

@@ -56,7 +56,7 @@ void setScalarValue(char * id, int scalarValue, Env * env)
    var->value.scalar   = scalarValue; 
 }
 
-Var * getValue(char * id, Env * env)
+Variable * getValue(char * id, Env * env)
 {
    return & findVar(id, env)->value;
 }

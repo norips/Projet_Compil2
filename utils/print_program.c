@@ -4,6 +4,7 @@
 
 #include "print_program.h"
 
+#include "utils.h"
 #include "symbol_table.h"
 #include "enum.h"
 #include "tools.h"
@@ -310,12 +311,6 @@ void printNode(nodeType * node, int indentation)
    }
    else
       error("invalid node type");
-}
-
-void error(char * message)
-{
-   fprintf(stderr, "FATAL ERROR: %s\n", message);
-   exit(EXIT_FAILURE);
 }
 
 void indent(int n)

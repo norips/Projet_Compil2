@@ -8,7 +8,6 @@ void printProgram(argType * global, symbolTag * functions, nodeType * main);
 void printFunction(symbolTag * function);
 void printVarDeclarations(argType * vars, int declaration);
 void printNode(nodeType * node, int indentation);
-void error(char * message);
 void indent(int n);
 
 #endif

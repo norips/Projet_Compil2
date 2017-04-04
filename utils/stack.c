@@ -37,3 +37,10 @@ void pop(Stack * stack)
       stack->items = realloc(stack->items, sizeof(Env*) * stack->size);
 }
 
+Env * top(Stack * stack)
+{
+   if (stack->size <= 0)
+      return NULL;
+   else
+      return stack->items[ stack->size - 1 ];
+}

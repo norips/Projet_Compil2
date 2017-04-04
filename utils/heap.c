@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "utils.h"
 #include "heap.h"
 #include "stack.h"
 
@@ -33,7 +34,7 @@ Array * newArray(int size, Heap * heap)
    array->keepStatus = heap->lastKeepStatus;
 
    array->size  = size;
-   array->items = malloc(sizeof(Var) * size);
+   array->items = malloc(sizeof(Variable) * size);
 
    array->next = heap->head;
    heap->head = array;
@@ -128,7 +129,35 @@ void collectGarbageCollect(Heap * heap)
 }
 
 
-void printVar(Var * var)
+Variable scalar(int value)
+{
+   Variable result;
+   result.isScalar = 1;
+   result.scalar   = value;
+   return result;
+}
+
+Variable array(Array * value)
+{
+   Variable result;
+   result.isScalar = 0;
+   result.array    = value;
+   return result;
+}
+
+void assertScalar(Variable * var)
+{
+   if (! var->isScalar)
+      error("expected scalar but got array");
+}
+
+void assertArray(Variable * var)
+{
+   if (var->isScalar)
+      error("expected array but got scalar");
+}
+
+void printVar(Variable * var)
 {
    if (var->isScalar)
       printf("%d", var->scalar);

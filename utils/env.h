@@ -7,7 +7,7 @@ typedef struct EnvVar EnvVar;
 struct EnvVar
 {
    char * id;
-   Var value;
+   Variable value;
 };
 
 typedef struct Env Env;
@@ -22,7 +22,7 @@ void freeEnv(Env * env);
 void setArrayValue(char * id, Array * arrayValue, Env * env);
 void setScalarValue(char * id, int scalarValue, Env * env);
 
-Var * getValue(char * id, Env * env); // ATTENTION : le pointeur retourné est invalidé à partir du moment ou une nouvelle variable est AJOUTÉ avec set*Value
+Variable * getValue(char * id, Env * env); // ATTENTION : le pointeur retourné est invalidé à partir du moment ou une nouvelle variable est AJOUTÉ avec set*Value
 
 int getScalarValue(char * id, Env * env);
 Array * getArrayValue(char * id, Env * env);
