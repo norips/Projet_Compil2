@@ -57,7 +57,7 @@ char *cpa(char *src){
                                 op = Ret;
                             } else if (strncmp("Ind",yytext+1,5)==0) { 
                                 op = Ind;   
-                            } else if (strncmp("LeTh",yytext+1,5)==0) { 
+                            } else if (strncmp("Lt",yytext+1,5)==0) { 
                                 op = LeTh;   
                             }            
                         }
