@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS = -Wall -g -Wno-unused-variable
 LDFLAGS = -ll
-OBJS= test_symbole ppascal analyseSem compPP interC3A compPPY86
+OBJS= test_symbole ppascal analyseSem compPP interC3A compPPY86 exCompPPY86
 TEST = $(wildcard test/*.pp)
 .PHONY: clean test
 
@@ -10,6 +10,9 @@ all : $(OBJS)
 %.c: %.y
 %.c: %.l
 
+
+exCompPPY86: exCompPPY86.c analyseSem compPPY86
+	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
 
 interC3A.yy.c: interC3A.l
 	flex -o $@ $< 

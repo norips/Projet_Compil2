@@ -57,7 +57,7 @@ char *cpa(char *src){
                                 op = Ret;
                             } else if (strncmp("Ind",yytext+1,5)==0) { 
                                 op = Ind;   
-                            } else if (strncmp("LeTh",yytext+1,5)==0) { 
+                            } else if (strncmp("Lt",yytext+1,5)==0) { 
                                 op = LeTh;   
                             }            
                         }
@@ -86,6 +86,7 @@ char *cpa(char *src){
                             free(dst);
                         }
 [ \t\n]                 ;
+.                       ;
 %%
 
 void affectGoodEnv(ENV *env,ENV *loc,char* ID, int val) {
@@ -111,7 +112,7 @@ int valchGoodEnv(ENV *env,ENV *loc,char* ID) {
         //Not in global env
         if(rech(ID,*env) == NULL) {
             //Add it to localEnv
-            fprintf(stderr,"Error\n");
+            fprintf(stderr,"Error %s\n",ID);
             exit(-1);
         } else {
             //Global var
@@ -131,7 +132,9 @@ void print_tas(int *array,int n) {
     }
 }
 void rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem) {
+
     if(elem == NULL || stop) return;
+    ecrire_env(*env);
     fprintf(stderr,"ETQ = %s\n",elem->ETIQ);
     switch(elem->OP) {
             case Afc: ;
@@ -187,7 +190,7 @@ void rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem) {
             case Jz:;
                 listStart = list.debut;
                 dest = elem->RES;
-                if(valch(*env, elem->ARG1) == 0){
+                if(valchGoodEnv(env,loc,elem->ARG1) == 0){
                     while (strcmp(listStart->ETIQ,dest) != 0){
                         listStart = listStart->SUIV;
                     }
@@ -205,7 +208,10 @@ void rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem) {
                 //Pass local var as Param
             case Param:
                 initenv(envParam, elem->ARG1);
-                affect(*envParam, elem->ARG1, valch(*env, elem->ARG2));
+                if(loc != NULL)
+                    affect(*envParam, elem->ARG1, valchGoodEnv(env,loc, elem->ARG2));
+                else
+                    affect(*envParam, elem->ARG1, valch(*env, elem->ARG2));
                 rec(env,loc,envParam,elem->SUIV);
                 break;
             case Call:
@@ -223,9 +229,12 @@ void rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem) {
 
                 ENV newParamEnv = Envalloc();
                 rec(env,&localEnv,&newParamEnv,listStart);
+
+                stop = 0;
                 rec(env,loc,envParam,elem->SUIV);
                 break;
             case Ret:
+                stop = 1;
                 break;
 
             case AfInd: ;
@@ -234,7 +243,7 @@ void rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem) {
                     int ind = valchGoodEnv(env,loc, elem->ARG2);
                     int val = valchGoodEnv(env,loc, elem->RES);
                     if((add+ind) >= STACK_SIZE) {
-                        fprintf(stderr,"Stack Overflow\n");
+                        fprintf(stderr,"Heap Overflow\n");
                         exit(-1);
                     }
                     TAS[add+ind] = val; 
@@ -243,7 +252,7 @@ void rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem) {
                     int ind = valch(*env, elem->ARG2);
                     int val = valch(*env, elem->RES);
                     if((add+ind) >= STACK_SIZE) {
-                        fprintf(stderr,"Stack Overflow\n");
+                        fprintf(stderr,"Heap Overflow\n");
                         exit(-1);
                     }
                     TAS[add+ind] = val; 
@@ -255,7 +264,7 @@ void rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem) {
                     int add = valchGoodEnv(env,loc, elem->ARG1);
                     int ind = valchGoodEnv(env,loc, elem->ARG2);
                     if((add+ind) >= STACK_SIZE) {
-                        fprintf(stderr,"Stack Overflow\n");
+                        fprintf(stderr,"Heap Overflow\n");
                         exit(-1);
                     }
                     affectGoodEnv(env,loc, elem->RES,TAS[add+ind]);
@@ -263,7 +272,7 @@ void rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem) {
                     int add = valch(*env, elem->ARG1);
                     int ind = valch(*env, elem->ARG2);
                     if((add+ind) >= STACK_SIZE) {
-                        fprintf(stderr,"Stack Overflow\n");
+                        fprintf(stderr,"Heap Overflow\n");
                         exit(-1);
                     }
                     initenv(env,elem->RES);
