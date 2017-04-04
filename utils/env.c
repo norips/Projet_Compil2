@@ -23,53 +23,62 @@ void freeEnv(Env * env)
    free(env);
 }
 
-EnvVar * findVar(char * id, Env * env)
+EnvVar * findVar(char * id, Env * env, int addIfNotFound)
 {
    int i = 0;
    for (; env->vars[i].id != NULL; i++)
       if (strcmp(env->vars[i].id, id) == 0)
          return & env->vars[i];
 
-   /* Add new var */
-   env->vars = realloc(env->vars, sizeof(EnvVar) * (i + 2));
+   if (addIfNotFound)
+   {
+      /* Add new var */
+      env->vars = realloc(env->vars, sizeof(EnvVar) * (i + 2));
    
-   env->vars[i].id             = strdup(id);
-   env->vars[i].value.isScalar = 1;
-   env->vars[i].value.scalar   = 0;
+      env->vars[i].id             = strdup(id);
+      env->vars[i].value.isScalar = 1;
+      env->vars[i].value.scalar   = 0;
 
-   env->vars[i + 1].id    = NULL; // terminating element
+      env->vars[i + 1].id    = NULL; // terminating element
 
-   return & env->vars[i];
+      return & env->vars[i];
+   }
+   else
+      return NULL;
 }
 
 void setArrayValue(char * id, Array * arrayValue, Env * env)
 {
-   EnvVar * var = findVar(id, env);
+   EnvVar * var = findVar(id, env, 1);
    var->value.isScalar = 0;
    var->value.array    = arrayValue; 
 }
 
 void setScalarValue(char * id, int scalarValue, Env * env)
 {
-   EnvVar * var = findVar(id, env);
+   EnvVar * var = findVar(id, env, 1);
    var->value.isScalar = 1;
    var->value.scalar   = scalarValue; 
 }
 
 Variable * getValue(char * id, Env * env)
 {
-   return & findVar(id, env)->value;
+   EnvVar * var = findVar(id, env, 0);
+   if (var == NULL)
+      return NULL;
+   else
+      return & var->value;
 }
 
-int getScalarValue(char * id, Env * env)
-{
-   return getValue(id, env)->scalar;
-}
+/* int getScalarValue(char * id, Env * env) */
+/* { */
+/*    return getValue(id, env)->scalar; */
+/* } */
 
-Array * getArrayValue(char * id, Env * env)
-{
-   return getValue(id, env)->array;
-}
+/* Array * getArrayValue(char * id, Env * env) */
+/* { */
+/*    return getValue(id, env)->array; */
+/* } */
 
 
 void printEnv(Env * env)

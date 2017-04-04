@@ -18,7 +18,7 @@ typedef enum { typeVar = 10, typeFun, typePro, typeArr, typeNone } symEnum;
 typedef enum { integer = 20, boolean, arrInt, arrBool, arrOf, typeVoid} typeEnum;
 
 
-typedef struct {
+typedef struct typeStruct {
     typeEnum type;
     struct typeStruct* next;
 } typeStruct;

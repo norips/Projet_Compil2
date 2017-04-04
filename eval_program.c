@@ -6,9 +6,13 @@
 #include "utils/utils.h"
 #include "utils/env.h"
 #include "utils/heap.h"
+#include "utils/stack.h"
 #include "ppascal.tab.h"
 
 Variable * getVar(char * id, Env * global, Stack * stack);
+Variable * evalNodeAssignable(nodeType * node, Env * global, Stack * stack, Heap * heap, symbolTag * functions);
+Variable evalFunction(nodeType * name, nodeType * args, Env * global, Stack * stack, Heap * heap, symbolTag * functions);
+Variable * evalFunctionAssignable(nodeType * name, nodeType * args, Env * global, Stack * stack, Heap * heap, symbolTag * functions);
 
 Variable evalNode(nodeType * node, Env * global, Stack * stack, Heap * heap, symbolTag * functions)
 {   
@@ -32,7 +36,10 @@ Variable evalNode(nodeType * node, Env * global, Stack * stack, Heap * heap, sym
             return scalar(0);
       }
       else
+      {
          error("invalid constant type");
+         return scalar(-1);
+      }
    }
    else if (node->type == typeId)
    {
@@ -140,10 +147,10 @@ Variable evalNode(nodeType * node, Env * global, Stack * stack, Heap * heap, sym
          
          case Acc:
          {
-            Var array = evalNode(opL, global, stack, heap, functions);
+            Variable array = evalNode(opL, global, stack, heap, functions);
             assertArray(&array);
 
-            Var index = evalNode(opR, global, stack, heap, functions);
+            Variable index = evalNode(opR, global, stack, heap, functions);
             assertScalar(&index);
 
             if (index.scalar < 0 || index.scalar >= array.array->size)
@@ -158,106 +165,125 @@ Variable evalNode(nodeType * node, Env * global, Stack * stack, Heap * heap, sym
          }
             
          case Aft:
-            printNode(opL, indentation); printf(" := "); printNode(opR, indentation);
-            break;
+         {
+            Variable * left  = evalNodeAssignable(opL, global, stack, heap, functions);
+            Variable   right = evalNode(opR, global, stack, heap, functions);
+
+            if (left->isScalar)
+            {
+               assertScalar(&right);
+               left->scalar = right.scalar;
+            }
+            else
+            {
+               assertArray(&right);
+               left->array = right.array;
+            }
+            
+            return right;
+         }
             
          case Af:
-            printNode(opL, indentation); printf(" := "); printNode(opR, indentation);
-            break;
+         {
+            Variable * left  = evalNodeAssignable(opL, global, stack, heap, functions);
+            Variable   right = evalNode(opR, global, stack, heap, functions);
+
+            if (left->isScalar)
+            {
+               assertScalar(&right);
+               left->scalar = right.scalar;
+            }
+            else
+            {
+               assertArray(&right);
+               left->array = right.array;
+            }
             
+            return right;
+         }
+         
          case Sk:
-            printf("skip");
-            break;
+            return scalar(0);
             
          case If:
-            printf("if "); printNode(opL, indentation);
+         {
+            Variable condition = evalNode(opL, global, stack, heap, functions);
+            assertScalar(&condition);
 
-            printf(" then\n");
-            indent(indentation);
-
-            printf("{\n");
-            indent(indentation + 1);
-            
-            printNode(opR, indentation + 1);
-
-            printf("\n");
-            indent(indentation);
-            
-            printf("}\n");
-            indent(indentation);
-            
-            printf("else\n");
-            indent(indentation);
-            
-            printf("{\n");
-            indent(indentation + 1);
-            
-            printNode(node->opr.op[2], indentation + 1);
-
-            printf("\n");
-            indent(indentation);
-            printf("}");
-            break;
+            if (condition.scalar)
+               return evalNode(opR, global, stack, heap, functions);
+            else
+               return evalNode(node->opr.op[2], global, stack, heap, functions);
+         }
             
          case Wh:
-            printf("while "); printNode(opL, indentation);
+         {
+            Variable result;
+            Variable condition = evalNode(opL, global, stack, heap, functions);
+            assertScalar(&condition);
 
-            printf(" do\n");
-            indent(indentation);
+            while (condition.scalar)
+            {
+               result = evalNode(opR, global, stack, heap, functions);
 
-            printf("{\n");
-            indent(indentation + 1);
-            
-            printNode(opR, indentation + 1);
+               condition = evalNode(opL, global, stack, heap, functions);
+               assertScalar(&condition);
+            }
 
-            printf("\n");
-            indent(indentation);
-            printf("}");
-            break;
+            return result;
+         }
             
          case Se:
-            printNode(opL, indentation);
-
-            printf(";\n");
-            indent(indentation);
+            evalNode(opL, global, stack, heap, functions);
+            return evalNode(opR, global, stack, heap, functions);
             
-            printNode(opR, indentation);
-            break;
-
          case Pro:
-            printNode(opL, indentation);
-            printf("(");
-            printNode(opR, indentation);
-            printf(")");
-            break;
+            return evalFunction(opL, opR, global, stack, heap, functions);
 
          case Fun:
-            printNode(opL, indentation);
-            printf("(");
-            printNode(opR, indentation);
-            printf(")");
-            break;
-
-         case L:
-            printNode(opL, indentation);
-            if (opR != NULL)
-            {
-               printf(", ");
-               printNode(opR, indentation);
-            }
-            break;
+            return evalFunction(opL, opR, global, stack, heap, functions);
+            
+            //case L:
+            /* printNode(opL, indentation); */
+            /* if (opR != NULL) */
+            /* { */
+            /*    printf(", "); */
+            /*    printNode(opR, indentation); */
+            /* } */
             
          default:
             error("invalid operator type");
+            return scalar(-1);
       }
    }
    else
+   {
       error("invalid node type");
+      return scalar(-1);
+   }
 }
 
-Var * getVar(char * id, Env * global, Stack * stack)
+Variable * evalNodeAssignable(nodeType * node, Env * global, Stack * stack, Heap * heap, symbolTag * functions)
 {
-   Var * result = NULL;
+   // TODO
+   return NULL;
+}
+
+Variable evalFunction(nodeType * name, nodeType * args, Env * global, Stack * stack, Heap * heap, symbolTag * functions)
+{
+   // TODO
+   return scalar(0);
+}
+
+Variable * evalFunctionAssignable(nodeType * name, nodeType * args, Env * global, Stack * stack, Heap * heap, symbolTag * functions)
+{
+   // TODO
+   return NULL;
+}
+
+Variable * getVar(char * id, Env * global, Stack * stack)
+{
+   Variable * result = NULL;
    
    Env * local = top(stack);
    if (local != NULL)
