@@ -32,6 +32,7 @@ typedef struct {
     char name[MAX_SIZE_ID];
     symEnum type;              /* type of node */
     int used;
+    int affected;
     union {
         varType _var;        /* variale */
         funType _fun;

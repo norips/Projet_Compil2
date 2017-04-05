@@ -37,8 +37,7 @@ typeStruct* analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 					exit(-1);
 				}
 			}
-
-			var->used=1;
+			var->used = 1;
 			switch(var->type) {
 				case typePro:
 				case typeFun:
@@ -67,6 +66,7 @@ typeStruct* analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 						fprintf(stderr, KRED "Near line %d \tAffect on a function %s\n" KNRM,C->lineNum,C->opr.op[0]->id.id);
 						exit(-1);
 					}
+					var->affected=1;
 					typeL = analyseSem(glob,loc,C->opr.op[0]);
 
 					typeR = analyseSem(glob,loc,C->opr.op[1]);
@@ -247,10 +247,13 @@ void analyseFun(symbolTag* glob,symbolTag *fun) {
 		localVar = (argType*) localVar->next;
 	}
 	while(params != NULL) {
-		if(var(&localSym,params->name,params->type) == NULL) {
+		symbolTag *s;
+		if((s=var(&localSym,params->name,params->type)) == NULL) {
 			fprintf(stderr, KRED "Already defined %s in %s parameters\n" KNRM,params->name,params->name);
 			exit(-1);
 		}
+
+		s->affected=1;
 		params = (argType*) params->next;
 	}
 	if(fun->type != typePro) {
@@ -290,8 +293,12 @@ int ex(argType *glob,symbolTag* table,nodeType* C){
     		fprintf(stderr, KRED "%s is a reserved keyword\n" KNRM,s->name);
 			exit(-1);	
     	}
-    	if(s->type == typeVar && s->used == 0) {
-    		fprintf(stderr, KYEL "Warning : Unused var %s\n" KNRM,s->name);
+    	if(s->type == typeVar) {
+    		if(s->used == 0) {
+    			fprintf(stderr, KYEL "Warning : Unused var %s\n" KNRM,s->name);
+    		} else if(s->affected == 0) {
+    			fprintf(stderr, KYEL "Warning : Unset var %s\n" KNRM,s->name);
+    		}
     	}
     }
 	return 1;

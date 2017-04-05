@@ -63,6 +63,8 @@ symbolTag* var(symbolTag** hash,char *id, typeStruct* type) {
     symbolTag* s = malloc(sizeof(symbolTag));
     strncpy(s->name, id,MAX_SIZE_ID);
     s->type = typeVar;
+    s->used = 0;
+    s->affected = 0;
     s->_var.type = type;
     if(setID(hash,id,s) == -1) {
         return NULL;
