@@ -151,7 +151,14 @@ Variable evalNode(nodeType * node, Env * global, Stack * stack, Heap * heap, sym
             assertScalar(&right);
             return scalar(left.scalar * right.scalar);
          }
-
+         
+         case Not:
+         {
+            Variable value = evalNode(opL, global, stack, heap, functions, tempRoots);
+            assertScalar(&value);
+            return scalar(! value.scalar);
+         }
+         
          case NewAr:
          {
             Variable size = evalNode(opR, global, stack, heap, functions, tempRoots);

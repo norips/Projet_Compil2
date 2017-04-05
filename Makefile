@@ -89,13 +89,20 @@ test_symbole: test_symbole.c utils/symbol_table.o utils/tools.o
 
 test: analyseSem
 	for test in $(TEST); do \
-		echo "Fichier :" $$test; \
-		./analyseSem < $$test > $$test.sem;\
+		echo "\n=====================================\nFichier :" $$test "\n"; \
+		./analyseSem < $$test 2>&1 | tee $$test.sem;\
 	done
+
 testC3A: exCompPP
 	for test in $(TEST); do \
-                echo "Fichier :" $$test; \
-                ./exCompPP < $$test > $$test.c3a;\
+		echo "\n=====================================\nFichier :" $$test "\n"; \
+                ./exCompPP < $$test | tee $$test.c3a;\
+        done
+
+test-run: ppascal
+	for test in $(TEST); do \
+		echo "\n=====================================\nFichier :" $$test "\n"; \
+                ./ppascal < $$test 2>&1 | tee $$test.run;\
         done
 
 clean:

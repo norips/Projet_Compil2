@@ -199,7 +199,13 @@ void printNode(nodeType * node, int indentation)
             printNode(opR, indentation);
             printf(")");
             break;
-            
+
+         case Not:
+            printf("(not ");
+            printNode(opL, indentation);
+            printf(")");
+            break;
+
          case NewAr:
          {
             char * type = get_type(opL->con.type);
