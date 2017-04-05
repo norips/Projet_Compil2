@@ -39,8 +39,8 @@ arr[10] := 12;
 arr[0] := 42;
 setRes(arr[10]);
 b := equal(2,a);
-a := 1 and 0
-/*res:=fibo(11)*/
+a := 1 and 0;
+res:=fibo(11)
 
 
 

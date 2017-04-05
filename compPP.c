@@ -54,10 +54,8 @@ int ex_bis(argType *glob,symbolTag* table,symbolTag* local,nodeType* node) {
             case Af:
                 ex_bis(glob,table,local,opR);
                 snprintf(buf,20,"CT%d",currentC);
-                if(local != NULL && getID(&local,opL->id.id) != NULL) {
-                    if(getID(&local,opL->id.id)->_var.type->type == typeVoid) {
-                        print(current++,"Af","RETFUN", buf,NULL );
-                    }
+                if(local != NULL && getID(&local,opL->id.id) != NULL && getID(&local,opL->id.id)->_var.type->type == typeVoid) { //Use typeVoid to simulate return var
+                    print(current++,"Af","RETFUN", buf,NULL );
                 } else {
                     print(current++,"Af",opL->id.id, buf,NULL );
                 }
