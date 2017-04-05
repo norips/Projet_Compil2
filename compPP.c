@@ -7,7 +7,6 @@
 #include "utils/tools.h"
 #include "utils/enum.h"
 #include "utils/environ.h"
-#include "utils/symbol_table.h"
 
 static int currentC=0, current=0, currentT=0 ;
 
@@ -45,10 +44,8 @@ int ex_bis(argType *glob,symbolTag* table,symbolTag* local,nodeType* node) {
     else if (node->type == typeOpr)
     {
         /* Operator */
-        
         nodeType * opL = node->opr.op[0];
         nodeType * opR = node->opr.op[1];
-        
         switch (node->opr.oper)
         {
             case Af:
@@ -203,7 +200,7 @@ int ex_bis(argType *glob,symbolTag* table,symbolTag* local,nodeType* node) {
                 break;
                 
             case Not:
-                ex_bis(glob,table,local,opR);
+                ex_bis(glob,table,local,opL);
                 snprintf(buf,20,"CT%d",currentC);
                 snprintf(bufVar,20,"CT%d",++currentC);
                 print(current++,"Not",buf,NULL,bufVar);

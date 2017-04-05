@@ -103,6 +103,9 @@ char* get_opr(int opr) {
 			
 		case Wh:
 			return ("Wh");
+
+		case Not:
+			return ("Not");
 			
 		case typeCon:
 			return ("Constant");
