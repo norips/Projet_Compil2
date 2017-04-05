@@ -1,19 +1,30 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "utils/symbol_table.h"
+
 #include "utils/AST.h"
+#include "utils/symbol_table.h"
+#include "utils/env.h"
+#include "utils/heap.h"
+#include "eval_program.h"
+
 #include "ppascal.tab.h"
 
-#include "utils/tools.h"
-#include "utils/print_program.h"
-
-int ex(argType *glob,symbolTag* table,nodeType* C)
+int ex(argType * globalVars, symbolTag * functions, nodeType * program)
 {
-   //print_env(glob,table);
+   Env  * globalEnv = newEnv();
+   Heap * heap      = newHeap();
+   
+   printf("\n### RUNNING PROGRAM ###\n");
 
-   //printf("\n### PRINTING PROGRAM ###\n");
-   printProgram(glob, table, C);
-        
+   evalProgram(globalVars, functions, program, globalEnv, heap);
+   
+   printf("### PROGRAM TERMINATED ###\n");
+   printf("\nGLOBAL ENVIRONMENT:\n");
+   printEnv(globalEnv);
+   printf("\n");
+   
+   freeEnv(globalEnv);
+   freeHeap(heap);
    return EXIT_SUCCESS;
 }
 

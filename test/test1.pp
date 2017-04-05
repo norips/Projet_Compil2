@@ -20,6 +20,11 @@ defpro setRes(x:integer) {
 	res := x
 }
 
+defun newArray(n: integer) : array of integer
+{
+        newArray := new array of integer[n]
+}
+
 defun equal(x:integer,y:integer) : boolean
         var local1 : integer,
         var local2 : boolean
@@ -32,14 +37,19 @@ defun equal(x:integer,y:integer) : boolean
         x := 42
 }
 
+defpro set(value: integer, arr: array of integer, index: integer)
+{
+        arr[index] := value
+}
+
 a:=2;
 arr:=new array of integer[a];
-arr:=new array of integer[42];
 arr[10] := 12;
 arr[0] := 42;
 setRes(arr[10]);
 b := equal(2,a);
-a := 1 and 0
+a := 1 and 0;
+set(42, new array of integer[10], 0)
 /*res:=fibo(11)*/
 
 

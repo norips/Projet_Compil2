@@ -47,6 +47,12 @@ EnvVar * findVar(char * id, Env * env, int addIfNotFound)
       return NULL;
 }
 
+void setValue(char * id, Variable value, Env * env)
+{
+   EnvVar * var = findVar(id, env, 1);
+   var->value = value;
+}
+
 void setArrayValue(char * id, Array * arrayValue, Env * env)
 {
    EnvVar * var = findVar(id, env, 1);

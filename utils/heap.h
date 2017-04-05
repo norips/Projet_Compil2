@@ -1,6 +1,9 @@
 #ifndef HEAP_H
 #define HEAP_H
 
+#include <time.h>
+
+typedef struct Env Env;
 typedef struct Stack Stack;
 
 typedef struct Variable Variable;
@@ -32,6 +35,7 @@ struct Heap
 {
    Array * head;
    int lastKeepStatus;
+   clock_t lastCollect;
 };
 
 Heap * newHeap();
@@ -40,7 +44,8 @@ void freeHeap(Heap * heap);
 Array * newArrayOfScalar(int size, Heap * heap);
 Array * newArrayOfArray(int size, Heap * heap);
 
-void collectGarbage(Heap * heap, Stack * roots);
+void collectGarbage(Heap * heap, Env * roots1, Stack * roots2, Stack * roots3);
+void collectGarbageAtIntervals(Heap * heap, Env * roots1, Stack * roots2, Stack * roots3);
 
 Variable scalar(int value);
 Variable array(Array * value);

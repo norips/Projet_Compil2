@@ -10,12 +10,33 @@
 #include "ppascal.tab.h"
 
 Variable * getVar(char * id, Env * global, Stack * stack);
-Variable * evalNodeAssignable(nodeType * node, Env * global, Stack * stack, Heap * heap, symbolTag * functions);
-Variable evalFunction(nodeType * name, nodeType * args, Env * global, Stack * stack, Heap * heap, symbolTag * functions);
-Variable * evalFunctionAssignable(nodeType * name, nodeType * args, Env * global, Stack * stack, Heap * heap, symbolTag * functions);
+Variable evalNode(nodeType * node, Env * global, Stack * stack, Heap * heap, symbolTag * functions, Stack * tempRoots);
+Variable * evalNodeAssignable(nodeType * node, Env * global, Stack * stack, Heap * heap, symbolTag * functions, Stack * tempRoots);
+Variable evalFunction(char * name, nodeType * args, Env * global, Stack * stack, Heap * heap, symbolTag * functions, Stack * tempsRoots);
+void addArgsToEnv(nodeType * node, argType * names, Env * newLocal, Env * global, Stack * stack, Heap * heap, symbolTag * functions, Stack * tempRoots);
+void addVarsToEnv(argType * args, Env * env);
 
-Variable evalNode(nodeType * node, Env * global, Stack * stack, Heap * heap, symbolTag * functions)
-{   
+
+void evalProgram(argType * globalVars, symbolTag * functions, nodeType * program, Env * globalEnv, Heap * heap)
+{
+   Stack * stack     = newStack();
+   Stack * tempRoots = newStack();
+
+   addVarsToEnv(globalVars, globalEnv);
+
+   evalNode(program, globalEnv, stack, heap, functions, tempRoots);
+
+   collectGarbage(heap, globalEnv, stack, tempRoots);
+   
+   freeStack(stack);
+   freeStack(tempRoots);
+}
+
+
+Variable evalNode(nodeType * node, Env * global, Stack * stack, Heap * heap, symbolTag * functions, Stack * tempRoots)
+{
+   collectGarbageAtIntervals(heap, global, stack, tempRoots);
+   
    if (node == NULL)
    {
       return scalar(0);
@@ -58,8 +79,8 @@ Variable evalNode(nodeType * node, Env * global, Stack * stack, Heap * heap, sym
       {
          case Pl:
          {
-            Variable left  = evalNode(opL, global, stack, heap, functions);
-            Variable right = evalNode(opR, global, stack, heap, functions);
+            Variable left  = evalNode(opL, global, stack, heap, functions, tempRoots);
+            Variable right = evalNode(opR, global, stack, heap, functions, tempRoots);
             assertScalar(&left);
             assertScalar(&right);
             return scalar(left.scalar + right.scalar);
@@ -67,8 +88,8 @@ Variable evalNode(nodeType * node, Env * global, Stack * stack, Heap * heap, sym
             
          case Mo:
          {
-            Variable left  = evalNode(opL, global, stack, heap, functions);
-            Variable right = evalNode(opR, global, stack, heap, functions);
+            Variable left  = evalNode(opL, global, stack, heap, functions, tempRoots);
+            Variable right = evalNode(opR, global, stack, heap, functions, tempRoots);
             assertScalar(&left);
             assertScalar(&right);
             return scalar(left.scalar - right.scalar);
@@ -76,8 +97,8 @@ Variable evalNode(nodeType * node, Env * global, Stack * stack, Heap * heap, sym
             
          case Or:
          {
-            Variable left  = evalNode(opL, global, stack, heap, functions);
-            Variable right = evalNode(opR, global, stack, heap, functions);
+            Variable left  = evalNode(opL, global, stack, heap, functions, tempRoots);
+            Variable right = evalNode(opR, global, stack, heap, functions, tempRoots);
             assertScalar(&left);
             assertScalar(&right);
             return scalar(left.scalar || right.scalar);
@@ -85,8 +106,8 @@ Variable evalNode(nodeType * node, Env * global, Stack * stack, Heap * heap, sym
             
          case Lt:
          {
-            Variable left  = evalNode(opL, global, stack, heap, functions);
-            Variable right = evalNode(opR, global, stack, heap, functions);
+            Variable left  = evalNode(opL, global, stack, heap, functions, tempRoots);
+            Variable right = evalNode(opR, global, stack, heap, functions, tempRoots);
             assertScalar(&left);
             assertScalar(&right);
             return scalar(left.scalar <= right.scalar);
@@ -94,8 +115,8 @@ Variable evalNode(nodeType * node, Env * global, Stack * stack, Heap * heap, sym
 
          case Lo:
          {
-            Variable left  = evalNode(opL, global, stack, heap, functions);
-            Variable right = evalNode(opR, global, stack, heap, functions);
+            Variable left  = evalNode(opL, global, stack, heap, functions, tempRoots);
+            Variable right = evalNode(opR, global, stack, heap, functions, tempRoots);
             assertScalar(&left);
             assertScalar(&right);
             return scalar(left.scalar < right.scalar);
@@ -103,8 +124,8 @@ Variable evalNode(nodeType * node, Env * global, Stack * stack, Heap * heap, sym
 
          case Eq:
          {
-            Variable left  = evalNode(opL, global, stack, heap, functions);
-            Variable right = evalNode(opR, global, stack, heap, functions);
+            Variable left  = evalNode(opL, global, stack, heap, functions, tempRoots);
+            Variable right = evalNode(opR, global, stack, heap, functions, tempRoots);
             assertScalar(&left);
             assertScalar(&right);
             return scalar(left.scalar == right.scalar);
@@ -112,8 +133,8 @@ Variable evalNode(nodeType * node, Env * global, Stack * stack, Heap * heap, sym
             
          case And:
          {
-            Variable left  = evalNode(opL, global, stack, heap, functions);
-            Variable right = evalNode(opR, global, stack, heap, functions);
+            Variable left  = evalNode(opL, global, stack, heap, functions, tempRoots);
+            Variable right = evalNode(opR, global, stack, heap, functions, tempRoots);
             assertScalar(&left);
             assertScalar(&right);
             return scalar(left.scalar && right.scalar);
@@ -121,8 +142,8 @@ Variable evalNode(nodeType * node, Env * global, Stack * stack, Heap * heap, sym
 
          case Mu:
          {
-            Variable left  = evalNode(opL, global, stack, heap, functions);
-            Variable right = evalNode(opR, global, stack, heap, functions);
+            Variable left  = evalNode(opL, global, stack, heap, functions, tempRoots);
+            Variable right = evalNode(opR, global, stack, heap, functions, tempRoots);
             assertScalar(&left);
             assertScalar(&right);
             return scalar(left.scalar * right.scalar);
@@ -130,7 +151,7 @@ Variable evalNode(nodeType * node, Env * global, Stack * stack, Heap * heap, sym
 
          case NewAr:
          {
-            Variable size = evalNode(opR, global, stack, heap, functions);
+            Variable size = evalNode(opR, global, stack, heap, functions, tempRoots);
             assertScalar(&size);
             
             if (opL->con.type->next->type == arrOf)
@@ -147,10 +168,10 @@ Variable evalNode(nodeType * node, Env * global, Stack * stack, Heap * heap, sym
          
          case Acc:
          {
-            Variable array = evalNode(opL, global, stack, heap, functions);
+            Variable array = evalNode(opL, global, stack, heap, functions, tempRoots);
             assertArray(&array);
 
-            Variable index = evalNode(opR, global, stack, heap, functions);
+            Variable index = evalNode(opR, global, stack, heap, functions, tempRoots);
             assertScalar(&index);
 
             if (index.scalar < 0 || index.scalar >= array.array->size)
@@ -166,8 +187,8 @@ Variable evalNode(nodeType * node, Env * global, Stack * stack, Heap * heap, sym
             
          case Aft:
          {
-            Variable * left  = evalNodeAssignable(opL, global, stack, heap, functions);
-            Variable   right = evalNode(opR, global, stack, heap, functions);
+            Variable * left  = evalNodeAssignable(opL, global, stack, heap, functions, tempRoots);
+            Variable   right = evalNode(opR, global, stack, heap, functions, tempRoots);
 
             if (left->isScalar)
             {
@@ -185,8 +206,8 @@ Variable evalNode(nodeType * node, Env * global, Stack * stack, Heap * heap, sym
             
          case Af:
          {
-            Variable * left  = evalNodeAssignable(opL, global, stack, heap, functions);
-            Variable   right = evalNode(opR, global, stack, heap, functions);
+            Variable * left  = evalNodeAssignable(opL, global, stack, heap, functions, tempRoots);
+            Variable   right = evalNode(opR, global, stack, heap, functions, tempRoots);
 
             if (left->isScalar)
             {
@@ -207,26 +228,26 @@ Variable evalNode(nodeType * node, Env * global, Stack * stack, Heap * heap, sym
             
          case If:
          {
-            Variable condition = evalNode(opL, global, stack, heap, functions);
+            Variable condition = evalNode(opL, global, stack, heap, functions, tempRoots);
             assertScalar(&condition);
 
             if (condition.scalar)
-               return evalNode(opR, global, stack, heap, functions);
+               return evalNode(opR, global, stack, heap, functions, tempRoots);
             else
-               return evalNode(node->opr.op[2], global, stack, heap, functions);
+               return evalNode(node->opr.op[2], global, stack, heap, functions, tempRoots);
          }
             
          case Wh:
          {
             Variable result;
-            Variable condition = evalNode(opL, global, stack, heap, functions);
+            Variable condition = evalNode(opL, global, stack, heap, functions, tempRoots);
             assertScalar(&condition);
 
             while (condition.scalar)
             {
-               result = evalNode(opR, global, stack, heap, functions);
+               result = evalNode(opR, global, stack, heap, functions, tempRoots);
 
-               condition = evalNode(opL, global, stack, heap, functions);
+               condition = evalNode(opL, global, stack, heap, functions, tempRoots);
                assertScalar(&condition);
             }
 
@@ -234,22 +255,14 @@ Variable evalNode(nodeType * node, Env * global, Stack * stack, Heap * heap, sym
          }
             
          case Se:
-            evalNode(opL, global, stack, heap, functions);
-            return evalNode(opR, global, stack, heap, functions);
+            evalNode(opL, global, stack, heap, functions, tempRoots);
+            return evalNode(opR, global, stack, heap, functions, tempRoots);
             
          case Pro:
-            return evalFunction(opL, opR, global, stack, heap, functions);
+            return evalFunction(opL->id.id, opR, global, stack, heap, functions, tempRoots);
 
          case Fun:
-            return evalFunction(opL, opR, global, stack, heap, functions);
-            
-            //case L:
-            /* printNode(opL, indentation); */
-            /* if (opR != NULL) */
-            /* { */
-            /*    printf(", "); */
-            /*    printNode(opR, indentation); */
-            /* } */
+            return evalFunction(opL->id.id, opR, global, stack, heap, functions, tempRoots);
             
          default:
             error("invalid operator type");
@@ -263,22 +276,125 @@ Variable evalNode(nodeType * node, Env * global, Stack * stack, Heap * heap, sym
    }
 }
 
-Variable * evalNodeAssignable(nodeType * node, Env * global, Stack * stack, Heap * heap, symbolTag * functions)
+Variable * evalNodeAssignable(nodeType * node, Env * global, Stack * stack, Heap * heap, symbolTag * functions, Stack * tempRoots)
 {
-   // TODO
-   return NULL;
+   collectGarbageAtIntervals(heap, global, stack, tempRoots);
+      
+   if (node == NULL)
+   {
+      error("expected assignable node but got null node");
+      return NULL;
+   }
+   else if (node->type == typeCon)
+   {
+      /* Constant */
+      error("expected assignable node but got constant node");
+      return NULL;
+   }
+   else if (node->type == typeId)
+   {
+      /* Identifier */
+      return getVar(node->id.id, global, stack);
+   }
+   else if (node->type == typeOpr)
+   {
+      /* Operator */
+
+      nodeType * opL = node->opr.op[0];
+      nodeType * opR = node->opr.op[1];
+      
+      switch (node->opr.oper)
+      {
+         case Acc:
+         {
+            Variable array = evalNode(opL, global, stack, heap, functions, tempRoots);
+            assertArray(&array);
+
+            Variable index = evalNode(opR, global, stack, heap, functions, tempRoots);
+            assertScalar(&index);
+
+            if (index.scalar < 0 || index.scalar >= array.array->size)
+            {
+               error("index out of bounds");
+               return NULL;
+            }
+            else
+            {
+               return & array.array->items[index.scalar];
+            }
+         }
+         
+         default:
+            error("expected assignable operator type");
+            return NULL;
+      }
+   }
+   else
+   {
+      error("invalid node type");
+      return NULL;
+   }
 }
 
-Variable evalFunction(nodeType * name, nodeType * args, Env * global, Stack * stack, Heap * heap, symbolTag * functions)
+Variable evalFunction(char * name, nodeType * args, Env * global, Stack * stack, Heap * heap, symbolTag * functions, Stack * tempRoots)
 {
-   // TODO
-   return scalar(0);
+   Env * local = newEnv();
+   symbolTag * function = getID(&functions, name);
+
+   /* add arguments as new local variables */
+   push(local, tempRoots);
+   addArgsToEnv(args, function->_fun.args, local, global, stack, heap, functions, tempRoots);
+   pop(tempRoots);
+   /* add local variables */
+   addVarsToEnv(function->_fun.local, local);
+   /* add result variable */
+   if (function->_fun.type->type == arrOf)
+      setArrayValue(function->name, NULL, local);
+   else
+      setScalarValue(function->name, 0, local);
+
+
+   /* push the new local environment to the stack */
+   push(local, stack);
+   /* eval function code */
+   evalNode(function->_fun.corps, global, stack, heap, functions, tempRoots);
+   Variable result = *getValue(function->name, local);
+   /* pop the local environment from the stack */
+   pop(stack);
+   
+   freeEnv(local);
+   return result;
 }
 
-Variable * evalFunctionAssignable(nodeType * name, nodeType * args, Env * global, Stack * stack, Heap * heap, symbolTag * functions)
+void addArgsToEnv(nodeType * node, argType * names, Env * newLocal, Env * global, Stack * stack, Heap * heap, symbolTag * functions, Stack * tempRoots)
 {
-   // TODO
-   return NULL;
+   if (node == NULL)
+   {}
+   else if (node->type == typeOpr && node->opr.oper == L)
+   {
+      nodeType * opL = node->opr.op[0];
+      nodeType * opR = node->opr.op[1];
+
+      /* add argument as new local variable */
+      Variable value = evalNode(opL, global, stack, heap, functions, tempRoots);
+      setValue(names->name, value, newLocal);
+
+      /* next argument */
+      addArgsToEnv(opR, names->next, newLocal, global, stack, heap, functions, tempRoots);
+   }
+   else
+      error("expected argument node");
+}
+
+void addVarsToEnv(argType * vars, Env * env)
+{
+   for (argType * var = vars; var != NULL; var = var->next)
+   {
+      if (var->type->type == arrOf)
+         setArrayValue(var->name, NULL, env);
+      else
+         setScalarValue(var->name, 0, env);
+   }
 }
 
 Variable * getVar(char * id, Env * global, Stack * stack)
@@ -300,3 +416,4 @@ Variable * getVar(char * id, Env * global, Stack * stack)
    else
       return result;
 }
+

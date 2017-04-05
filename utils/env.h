@@ -19,6 +19,7 @@ struct Env
 Env * newEnv();
 void freeEnv(Env * env);
 
+void setValue(char * id, Variable value, Env * env);
 void setArrayValue(char * id, Array * arrayValue, Env * env);
 void setScalarValue(char * id, int scalarValue, Env * env);
 

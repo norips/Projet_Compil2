@@ -8,9 +8,10 @@
 Array * newArray(int size, Heap * heap);
 void freeArray(Array * array);
 
-void collectGarbageKeep(Stack * roots, int lastKeepStatus);
+void collectGarbageKeepStack(Stack * roots, int lastKeepStatus);
+void collectGarbageKeepEnv(Env * roots, int lastKeepStatus);
 void collectGarbageKeepNode(Array * node, int lastKeepStatus);
-void collectGarbageCollect(Heap * heap);
+void collectGarbageCollect(Heap * heap, int print);
 
 Heap * newHeap()
 {
@@ -18,12 +19,13 @@ Heap * newHeap()
 
    heap->head = NULL;
    heap->lastKeepStatus = 0;
+   heap->lastCollect    = 0;
 
    return heap;
 }
 void freeHeap(Heap * heap)
 {
-   collectGarbageCollect(heap);
+   collectGarbageCollect(heap, 0);
    free(heap);
 }
 
@@ -74,28 +76,42 @@ Array * newArrayOfArray(int size, Heap * heap)
    return array;
 }
 
-void collectGarbage(Heap * heap, Stack * roots)
+void collectGarbageAtIntervals(Heap * heap, Env * roots1, Stack * roots2, Stack * roots3)
 {
-   collectGarbageKeep(roots, heap->lastKeepStatus);
-   collectGarbageCollect(heap);
+   clock_t time = clock();
+   if (time - heap->lastCollect >= CLOCKS_PER_SEC)
+   {
+      collectGarbage(heap, roots1, roots2, roots3);
+      heap->lastCollect = time;
+   }
 }
 
-void collectGarbageKeep(Stack * roots, int lastKeepStatus)
+void collectGarbage(Heap * heap, Env * roots1, Stack * roots2, Stack * roots3)
+{
+   collectGarbageKeepEnv  (roots1, heap->lastKeepStatus);
+   collectGarbageKeepStack(roots2, heap->lastKeepStatus);
+   collectGarbageKeepStack(roots3, heap->lastKeepStatus);
+   
+   collectGarbageCollect(heap, 1);
+}
+
+void collectGarbageKeepStack(Stack * roots, int lastKeepStatus)
 {
    for (int i = 0; i < roots->size; i++)
+      collectGarbageKeepEnv(roots->items[i], lastKeepStatus);
+}
+void collectGarbageKeepEnv(Env * roots, int lastKeepStatus)
+{
+   for (int j = 0; roots->vars[j].id != NULL; j++)
    {
-      Env * rootsPart = roots->items[i];
-
-      for (int j = 0; rootsPart->vars[j].id != NULL; j++)
-      {
-         if (! rootsPart->vars[j].value.isScalar)
-            collectGarbageKeepNode( rootsPart->vars[j].value.array, lastKeepStatus );
-      }
+      if (! roots->vars[j].value.isScalar)
+         collectGarbageKeepNode( roots->vars[j].value.array, lastKeepStatus );
    }
+   
 }
 void collectGarbageKeepNode(Array * node, int lastKeepStatus)
 {
-   if (node->keepStatus == lastKeepStatus)
+   if (node != NULL && node->keepStatus == lastKeepStatus)
    {
       node->keepStatus = ! lastKeepStatus;
 
@@ -107,8 +123,11 @@ void collectGarbageKeepNode(Array * node, int lastKeepStatus)
    }
 }
 
-void collectGarbageCollect(Heap * heap)
+void collectGarbageCollect(Heap * heap, int print)
 {
+   int collected = 0;
+   int kept      = 0;
+   
    Array ** previousNext = & heap->head;
    for (Array * node = heap->head; node != NULL; node = *previousNext)
    {
@@ -117,15 +136,25 @@ void collectGarbageCollect(Heap * heap)
          // collect
          *previousNext = node->next;
          freeArray(node);
+
+         collected++;
       }
       else // if (node->keepStatus == ! heap->lastKeepStatus)
       {
          // keep
          previousNext = & node->next;
+
+         kept++;
       }
    }
 
    heap->lastKeepStatus = ! heap->lastKeepStatus;
+
+   if (print)
+   {
+      printf("\n### GARBAGE COLLECTION TRIGGERED ###\n");
+      printf("%d arrays collected, %d arrays kept\n\n", collected, kept);
+   }
 }
 
 
