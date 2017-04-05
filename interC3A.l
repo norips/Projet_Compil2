@@ -134,8 +134,7 @@ void print_tas(int *array,int n) {
 void rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem) {
 
     if(elem == NULL || stop) return;
-    fprintf(stderr,"ETQ = %s\n",elem->ETIQ);
-    
+        
     switch(elem->OP) {
             case Afc: ;
                 if(loc != NULL) {
