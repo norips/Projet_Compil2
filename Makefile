@@ -92,10 +92,10 @@ test: analyseSem
 		echo "Fichier :" $$test; \
 		./analyseSem < $$test > $$test.sem;\
 	done
-testC3A: test compPP
+testC3A: exCompPP
 	for test in $(TEST); do \
                 echo "Fichier :" $$test; \
-                ./compPP < $$test > $$test.c3a;\
+                ./exCompPP < $$test > $$test.c3a;\
         done
 
 clean:
