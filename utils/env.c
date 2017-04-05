@@ -76,17 +76,6 @@ Variable * getValue(char * id, Env * env)
       return & var->value;
 }
 
-/* int getScalarValue(char * id, Env * env) */
-/* { */
-/*    return getValue(id, env)->scalar; */
-/* } */
-
-/* Array * getArrayValue(char * id, Env * env) */
-/* { */
-/*    return getValue(id, env)->array; */
-/* } */
-
-
 void printEnv(Env * env)
 {
    for (int i = 0; env->vars[i].id != NULL; i++)

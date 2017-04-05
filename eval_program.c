@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "eval_program.h"
 
 #include "utils/enum.h"
@@ -39,6 +41,7 @@ Variable evalNode(nodeType * node, Env * global, Stack * stack, Heap * heap, sym
    
    if (node == NULL)
    {
+      error("null node");
       return scalar(0);
    }
    else if (node->type == typeCon)
@@ -174,7 +177,12 @@ Variable evalNode(nodeType * node, Env * global, Stack * stack, Heap * heap, sym
             Variable index = evalNode(opR, global, stack, heap, functions, tempRoots);
             assertScalar(&index);
 
-            if (index.scalar < 0 || index.scalar >= array.array->size)
+            if (array.array == NULL)
+            {
+               error("access to a null array reference");
+               return scalar(-1);
+            }
+            else if (index.scalar < 0 || index.scalar >= array.array->size)
             {
                error("index out of bounds");
                return scalar(-1);
@@ -313,7 +321,12 @@ Variable * evalNodeAssignable(nodeType * node, Env * global, Stack * stack, Heap
             Variable index = evalNode(opR, global, stack, heap, functions, tempRoots);
             assertScalar(&index);
 
-            if (index.scalar < 0 || index.scalar >= array.array->size)
+            if (array.array == NULL)
+            {
+               error("access to a null array reference");
+               return NULL;
+            }
+            else if (index.scalar < 0 || index.scalar >= array.array->size)
             {
                error("index out of bounds");
                return NULL;

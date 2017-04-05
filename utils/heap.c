@@ -196,17 +196,22 @@ void printVar(Variable * var)
 
 void printArray(Array * array)
 {
-   printf("[");
-
-   if (array->size > 0)
+   if (array == NULL)
+      printf("null");
+   else
    {
-      printVar( & array->items[0] );
-      for (int i = 1; i < array->size; i++)
+      printf("[");
+
+      if (array->size > 0)
       {
-         printf(", ");
          printVar( & array->items[0] );
+         for (int i = 1; i < array->size; i++)
+         {
+            printf(", ");
+            printVar( & array->items[i] );
+         }
       }
-   }
       
-   printf("]");
+      printf("]");
+   }
 }

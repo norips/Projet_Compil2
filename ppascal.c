@@ -5,6 +5,7 @@
 #include "utils/symbol_table.h"
 #include "utils/env.h"
 #include "utils/heap.h"
+#include "analyseSem.h"
 #include "eval_program.h"
 
 #include "ppascal.tab.h"
