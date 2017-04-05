@@ -1,4 +1,4 @@
-var a:integer, var b:boolean, var res:integer, var arr:array of integer
+var a:integer, var b:boolean, var c:boolean, var res:integer, var arr:array of integer
 
 defun sum(x:integer,y:integer) : integer {
 	sum := x + y
@@ -22,12 +22,13 @@ defpro setRes(x:integer) {
 
 defun equal(x:integer,y:integer) : boolean
         var local1 : integer,
-        var local2 : boolean
+        var local2 : boolean,
+        var local3 : boolean
 {
-        local1 := 1 + 2;
+        local3 := x=y;
         local2 := true or false;
 
-	equal := x=y;
+	    equal := local3;
 
         x := 42
 }
@@ -38,6 +39,7 @@ arr:=new array of integer[42];
 arr[10] := 12;
 arr[0] := 42;
 setRes(arr[10]);
+c := arr[10] = res;
 b := equal(2,a);
 a := 1 and 0;
 res:=fibo(11)

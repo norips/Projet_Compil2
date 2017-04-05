@@ -265,7 +265,7 @@ void ex(argType *glob,symbolTag* table,nodeType* p) {
 
     argType* varGlob = glob;
     while(varGlob != NULL) {
-            print(current++,"Af",varGlob->name,"0","");
+            print(current++,"Afc","0","",varGlob->name);
             varGlob = varGlob->next;
     }
     int res = ex_bis(glob,table,NULL,p);

@@ -286,6 +286,19 @@ void rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem) {
                 }
                 rec(env,loc,envParam,elem->SUIV);
                 break;
+            case Not:
+                if(loc != NULL) {
+                    int arg1 = valchGoodEnv(env,loc,elem->ARG1);
+                    affectGoodEnv(env,loc,elem->RES,!arg1);
+                } else {
+                    initenv(env, elem->RES);
+                    initenv(env, elem->ARG1);
+                    int res = valch(*env, elem->ARG1);
+                    affect(*env, elem->RES, !res);       
+                }
+                rec(env,loc,envParam,elem->SUIV);
+                break;
+                
 
         }
 }

@@ -98,4 +98,4 @@ testC3A: test compPP
 
 clean:
 	rm -f *.o *.output *.yy.c *.tab.* $(OBJS)
-	rm -f utils/*.o utils/*.tab.* test/*.sem
+	rm -f utils/*.o utils/*.tab.* test/*.sem test/*.c3a

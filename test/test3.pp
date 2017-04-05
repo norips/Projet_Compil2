@@ -12,7 +12,7 @@ sizeTab := 10;
 X1 := new array of integer[sizeTab];
 X1[4] := 15;
 X1[5] := 11;
-if X3 <=10 then {
+if X3 < 11 then {
 	X2:=X1[4]
 } else {
 	X2:=X1[5]
