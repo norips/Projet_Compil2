@@ -90,7 +90,11 @@ test: analyseSem
 		echo "Fichier :" $$test; \
 		./analyseSem < $$test > $$test.sem;\
 	done
-
+testC3A: test compPP
+	for test in $(TEST); do \
+                echo "Fichier :" $$test; \
+                ./compPP < $$test > $$test.c3a;\
+        done
 
 clean:
 	rm -f *.o *.output *.yy.c *.tab.* $(OBJS)

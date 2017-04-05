@@ -243,6 +243,9 @@ int ex_bis(argType *glob,symbolTag* table,symbolTag* local,nodeType* node) {
                 snprintf(buf3,20,"CT%d",++currentC);
                 print(current++,"Lt",buf,buf2,buf3);
                 break;
+            case Sk:
+                print(current++,"Sk",NULL,NULL,NULL);
+                break;
             default:
                 printf("invalid operator type %s",get_opr(node->opr.oper));
                 
