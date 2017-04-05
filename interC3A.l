@@ -134,8 +134,8 @@ void print_tas(int *array,int n) {
 void rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem) {
 
     if(elem == NULL || stop) return;
-    ecrire_env(*env);
     fprintf(stderr,"ETQ = %s\n",elem->ETIQ);
+    
     switch(elem->OP) {
             case Afc: ;
                 if(loc != NULL) {
@@ -182,7 +182,7 @@ void rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem) {
             case Jp:;
                 QUAD listStart = list.debut;
                 char *dest = elem->RES;
-                while (strcmp(listStart->ETIQ,dest) != 0)
+                while (listStart != NULL && strcmp(listStart->ETIQ,dest) != 0)
                     listStart = listStart->SUIV;
                 rec(env,loc,envParam,listStart);
                 break;
@@ -190,12 +190,18 @@ void rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem) {
             case Jz:;
                 listStart = list.debut;
                 dest = elem->RES;
-                if(valchGoodEnv(env,loc,elem->ARG1) == 0){
+                int res = 0;
+                if(loc != NULL)
+                    res = valchGoodEnv(env,loc,elem->ARG1);
+                else 
+                    res = valch(*env,elem->ARG1);
+                if(res == 0) {
                     while (strcmp(listStart->ETIQ,dest) != 0){
                         listStart = listStart->SUIV;
                     }
                     rec(env,loc,envParam,listStart);
                 }else{
+
                     rec(env,loc,envParam,elem->SUIV);
                 }
                 break;
@@ -280,6 +286,19 @@ void rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem) {
                 }
                 rec(env,loc,envParam,elem->SUIV);
                 break;
+            case Not:
+                if(loc != NULL) {
+                    int arg1 = valchGoodEnv(env,loc,elem->ARG1);
+                    affectGoodEnv(env,loc,elem->RES,!arg1);
+                } else {
+                    initenv(env, elem->RES);
+                    initenv(env, elem->ARG1);
+                    int res = valch(*env, elem->ARG1);
+                    affect(*env, elem->RES, !res);       
+                }
+                rec(env,loc,envParam,elem->SUIV);
+                break;
+                
 
         }
 }

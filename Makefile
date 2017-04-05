@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS = -Wall -g -Wno-unused-variable
 LDFLAGS = -ll
-OBJS= test_symbole ppascal analyseSem compPP interC3A compPPY86 exCompPPY86
+OBJS= test_symbole ppascal analyseSem compPP interC3A compPPY86 exCompPPY86 exCompPP
 TEST = $(wildcard test/*.pp)
 .PHONY: clean test
 
@@ -10,6 +10,8 @@ all : $(OBJS)
 %.c: %.y
 %.c: %.l
 
+exCompPP: exCompPP.c analyseSem compPP
+	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
 
 exCompPPY86: exCompPPY86.c analyseSem compPPY86
 	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
@@ -90,8 +92,12 @@ test: analyseSem
 		echo "Fichier :" $$test; \
 		./analyseSem < $$test > $$test.sem;\
 	done
-
+testC3A: exCompPP
+	for test in $(TEST); do \
+                echo "Fichier :" $$test; \
+                ./exCompPP < $$test > $$test.c3a;\
+        done
 
 clean:
 	rm -f *.o *.output *.yy.c *.tab.* $(OBJS)
-	rm -f utils/*.o utils/*.tab.* test/*.sem
+	rm -f utils/*.o utils/*.tab.* test/*.sem test/*.c3a

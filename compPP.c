@@ -7,7 +7,6 @@
 #include "utils/tools.h"
 #include "utils/enum.h"
 #include "utils/environ.h"
-#include "utils/symbol_table.h"
 
 static int currentC=0, current=0, currentT=0 ;
 
@@ -45,19 +44,15 @@ int ex_bis(argType *glob,symbolTag* table,symbolTag* local,nodeType* node) {
     else if (node->type == typeOpr)
     {
         /* Operator */
-        
         nodeType * opL = node->opr.op[0];
         nodeType * opR = node->opr.op[1];
-        
         switch (node->opr.oper)
         {
             case Af:
                 ex_bis(glob,table,local,opR);
                 snprintf(buf,20,"CT%d",currentC);
-                if(local != NULL && getID(&local,opL->id.id) != NULL) {
-                    if(getID(&local,opL->id.id)->_var.type->type == typeVoid) {
-                        print(current++,"Af","RETFUN", buf,NULL );
-                    }
+                if(local != NULL && getID(&local,opL->id.id) != NULL && getID(&local,opL->id.id)->_var.type->type == typeVoid) { //Use typeVoid to simulate return var
+                    print(current++,"Af","RETFUN", buf,NULL );
                 } else {
                     print(current++,"Af",opL->id.id, buf,NULL );
                 }
@@ -205,7 +200,7 @@ int ex_bis(argType *glob,symbolTag* table,symbolTag* local,nodeType* node) {
                 break;
                 
             case Not:
-                ex_bis(glob,table,local,opR);
+                ex_bis(glob,table,local,opL);
                 snprintf(buf,20,"CT%d",currentC);
                 snprintf(bufVar,20,"CT%d",++currentC);
                 print(current++,"Not",buf,NULL,bufVar);
@@ -248,6 +243,9 @@ int ex_bis(argType *glob,symbolTag* table,symbolTag* local,nodeType* node) {
                 snprintf(buf3,20,"CT%d",++currentC);
                 print(current++,"Lt",buf,buf2,buf3);
                 break;
+            case Sk:
+                print(current++,"Sk",NULL,NULL,NULL);
+                break;
             default:
                 printf("invalid operator type %s",get_opr(node->opr.oper));
                 
@@ -267,7 +265,7 @@ void ex(argType *glob,symbolTag* table,nodeType* p) {
 
     argType* varGlob = glob;
     while(varGlob != NULL) {
-            print(current++,"Af",varGlob->name,"0","");
+            print(current++,"Afc","0","",varGlob->name);
             varGlob = varGlob->next;
     }
     int res = ex_bis(glob,table,NULL,p);
