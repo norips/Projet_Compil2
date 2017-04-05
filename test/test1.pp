@@ -1,5 +1,4 @@
 var a:integer, var b:boolean, var c:boolean, var res:integer, var arr:array of integer
-
 defun sum(x:integer,y:integer) : integer {
 	sum := x + y
 }

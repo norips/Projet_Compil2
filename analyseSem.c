@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <regex.h>     
 #include "utils/symbol_table.h"
 #include "utils/AST.h"
 #include "ppascal.tab.h"
@@ -265,7 +266,9 @@ void analyseFun(symbolTag* glob,symbolTag *fun) {
     	}
     }
 }
-
+   
+regex_t regex;
+int reti;
 int ex(argType *glob,symbolTag* table,nodeType* C){
 	symbolTag *s,*tmp;
 	while(glob != NULL) {
@@ -281,8 +284,12 @@ int ex(argType *glob,symbolTag* table,nodeType* C){
     	}
     }
     analyseSem(table,NULL,C);
-
     HASH_ITER(hh,table, s, tmp) {
+    	reti = regexec(&regex, s->name, 0, NULL, 0);
+    	if(reti == 0) {
+    		fprintf(stderr, KRED "%s is a reserved keyword\n" KNRM,s->name);
+			exit(-1);	
+    	}
     	if(s->type == typeVar && s->used == 0) {
     		fprintf(stderr, KYEL "Warning : Unused var %s\n" KNRM,s->name);
     	}
@@ -290,6 +297,12 @@ int ex(argType *glob,symbolTag* table,nodeType* C){
 	return 1;
 }
 int main() {
+	reti = regcomp(&regex, "(CT[0-9]+)|(TAS)|(RETFUN)|(JMP[0-9]+)", REG_EXTENDED);
+	if (reti) {
+		fprintf(stderr, "Could not compile regex\n");
+		exit(1);
+	}
+
 	//yydebug = 1;
 	return yyparse();
 }
