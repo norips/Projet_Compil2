@@ -8,6 +8,7 @@ BILQUAD list;
 char *etiq=NULL,*arg1=NULL,*arg2=NULL,*res=NULL;
 int op = 0;
 int first = 1;
+int line = 1;
 char *cpa(char *src){
     int len = strlen(src);
     char *dst = malloc(sizeof(int)*(len+1));
@@ -85,8 +86,9 @@ char *cpa(char *src){
                             }
                             free(dst);
                         }
-[ \t\n]                 ;
-.                       ;
+[ \t]                 ;
+[\n]                    {line++;}
+.                       ; {fprintf(stderr,"At line %d: Unespected \"%s\"\n",line,yytext); exit(-1);}
 %%
 
 void affectGoodEnv(ENV *env,ENV *loc,char* ID, int val) {
