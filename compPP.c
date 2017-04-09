@@ -7,6 +7,7 @@
 #include "utils/tools.h"
 #include "utils/enum.h"
 #include "utils/environ.h"
+#include "analyseSem.h"
 
 static int currentC=0, current=0, currentT=0 ;
 
@@ -259,6 +260,8 @@ int ex_bis(argType *glob,symbolTag* table,symbolTag* local,nodeType* node) {
 
 
 void ex(argType *glob,symbolTag* table,nodeType* p) {
+    //Launch semantic analyser
+    exSem(glob,table,p);
     symbolTag *s,*tmp;
     print(current++,"Afc", "0", NULL, "TAS");
     print(current++,"Afc", "0", NULL, "RETFUN");

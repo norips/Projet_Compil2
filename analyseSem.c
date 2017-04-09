@@ -270,9 +270,14 @@ void analyseFun(symbolTag* glob,symbolTag *fun) {
     }
 }
    
-regex_t regex;
-int reti;
-int ex(argType *glob,symbolTag* table,nodeType* C){
+int exSem(argType *glob,symbolTag* table,nodeType* C){
+	regex_t regex;
+	int reti;
+	reti = regcomp(&regex, "(CT[0-9]+)|(TAS)|(RETFUN)|(JMP[0-9]+)|(MUL)|(LOWER)|(EQUAL)|(LOWEREQ)|(MULPLUS)|(NEXT)|(SIGN)", REG_EXTENDED);
+	if (reti) {
+		fprintf(stderr, "Could not compile regex\n");
+		exit(1);
+	}
 	symbolTag *s,*tmp;
 	while(glob != NULL) {
 		if(var(&table,glob->name,glob->type) == NULL) {
@@ -303,14 +308,3 @@ int ex(argType *glob,symbolTag* table,nodeType* C){
     }
 	return 1;
 }
-int main() {
-	reti = regcomp(&regex, "(CT[0-9]+)|(TAS)|(RETFUN)|(JMP[0-9]+)", REG_EXTENDED);
-	if (reti) {
-		fprintf(stderr, "Could not compile regex\n");
-		exit(1);
-	}
-
-	//yydebug = 1;
-	return yyparse();
-}
-

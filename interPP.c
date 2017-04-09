@@ -12,6 +12,8 @@
 
 int ex(argType * globalVars, symbolTag * functions, nodeType * program)
 {
+   //Launch semantic analyser
+   exSem(globalVars,functions,program);
    Env  * globalEnv = newEnv();
    Heap * heap      = newHeap();
    

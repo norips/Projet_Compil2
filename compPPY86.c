@@ -6,7 +6,7 @@
 #include "utils/uthash.h"
 #include "utils/tools.h"
 #include "utils/enum.h"
-#include "utils/environ.h"
+#include "analyseSem.h"
 
 
 #define STACK_SIZE 1024
@@ -438,6 +438,8 @@ void ex_fun(symbolTag* glob,symbolTag *fun) {
 }
 
 void ex(argType *glob,symbolTag* table,nodeType* p) {
+    //Launch semantic analyser
+    exSem(glob,table,p);
     symbolTag *s,*tmp;
     //Add global var to global symbol table
     while(glob != NULL) {
