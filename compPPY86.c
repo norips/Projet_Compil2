@@ -266,7 +266,7 @@ int ex_bis(symbolTag *glob,symbolTag *loc,nodeType* node) {
                 sprintf(buf,"%d",i*4);
                 print(current++,"iaddl",buf,"%esp"); //Save value
                 break;
-            case Lt:
+            case Le:
                 ex_bis(glob,loc,opR);
                 print(current++,"pushl","%eax",NULL);
                 ex_bis(glob,loc,opL);
@@ -274,7 +274,7 @@ int ex_bis(symbolTag *glob,symbolTag *loc,nodeType* node) {
                 print(current++,"call","LOWEREQ",NULL);
                 print(current++,"iaddl","8","%esp"); //empty stack
                 break;
-            case Lo:
+            case Lt:
                 ex_bis(glob,loc,opR);
                 print(current++,"pushl","%eax",NULL);
                 ex_bis(glob,loc,opL);

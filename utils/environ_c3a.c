@@ -57,8 +57,19 @@ int eval(int op, int arg1, int arg2)
     case Or:
       return(arg1 || arg2);
     case LeTh:
-      if(arg1 < arg2)
+      if(arg1 < arg2) {
         return 1;
+      } else {
+        return 0;
+      }
+      break;
+    case LeEq:
+      if(arg1 <= arg2) {
+        return 1;
+      } else {
+        return 0;
+      }
+      break;
     default:
       return(0);
     }

@@ -56,11 +56,13 @@ char *cpa(char *src){
                                 op = Call;   
                             } else if (strncmp("Ret",yytext+1,3)==0) {
                                 op = Ret;
-                            } else if (strncmp("Ind",yytext+1,5)==0) { 
+                            } else if (strncmp("Ind",yytext+1,3)==0) { 
                                 op = Ind;   
-                            } else if (strncmp("Lt",yytext+1,5)==0) { 
+                            } else if (strncmp("Lt",yytext+1,2)==0) { 
                                 op = LeTh;   
-                            }            
+                            } else if (strncmp("Le",yytext+1,2)==0) { 
+                                op = LeEq;   
+                            }               
                         }
 <ARG_1>:[A-Za-z0-9]*      {
                             BEGIN ARG_2;
@@ -136,7 +138,6 @@ void print_tas(int *array,int n) {
 void rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem) {
 
     if(elem == NULL || stop) return;
-        
     switch(elem->OP) {
             case Afc: ;
                 if(loc != NULL) {
@@ -152,6 +153,7 @@ void rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem) {
             case Mo:
             case And:
             case LeTh:
+            case LeEq:
             case Or: ;
                 if(loc != NULL) {
                     int arg1 = valchGoodEnv(env,loc,elem->ARG1);

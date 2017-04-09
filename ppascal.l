@@ -33,8 +33,8 @@ skip			  {return Sk;}
 and               {return And;}
 or                {return Or;}
 not               {return Not;}
-"<="              {return Lt;}
-"<"               {return Lo;}
+"<="              {return Le;}
+"<"               {return Lt;}
 "="               {return Eq;}
 "array of"        {return T_ar;}
 "new array of"    {return NewAr;}
