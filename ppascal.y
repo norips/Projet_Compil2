@@ -11,6 +11,19 @@
 
 #define YYDEBUG 1
 
+/*
+
+DRUON DOMENGER JOURDE
+
+Question 1: ppascal.y
+La fonction appelé a comme prototype ex(argType *glob,symbolTag* table,nodeType* C) et est implémenté dans les fichier ci dessous.
+Question 2: analyseSem.c 
+Question 3: eval_program.c 
+Question 4: compPP.c
+Question 5: interC3A.l fonction rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem)
+Question 6: compPPY86.c 
+Question 7: utils/heap.c
+*/
 symbolTag* h_table = NULL;
 
 
