@@ -71,8 +71,8 @@ char* get_opr(int opr) {
 		case Lt:
 			return ("Lt");
 			
-		case Lo:
-			return ("Lo");
+		case Le:
+			return ("Le");
 			
 		case Eq:
 			return ("Eq");
