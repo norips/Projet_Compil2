@@ -15,7 +15,7 @@
 #define Aft 804 //Affection to an array
 typedef enum { typeCon = 0, typeId, typeOpr } nodeEnum;
 typedef enum { typeVar = 10, typeFun, typePro, typeArr, typeNone } symEnum;
-typedef enum { integer = 20, boolean, arrInt, arrBool, arrOf, typeVoid} typeEnum;
+typedef enum { integer = 20, boolean, arrOf, typeVoid} typeEnum;
 
 
 typedef struct typeStruct {

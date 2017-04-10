@@ -22,8 +22,8 @@ typedef struct argType {
 /* identifiers */
 typedef struct {
     typeStruct* type;
-    argType *args ;                      /* subscript to sym array */
-    argType *local ;                      /* subscript to sym array */
+    argType *args ;                      /* list of args */
+    argType *local ;                      /* list of local var */
     nodeType *corps;
 } funType;
 
