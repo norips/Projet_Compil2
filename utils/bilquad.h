@@ -19,6 +19,7 @@
 #define Ret 272
 #define Ind 273
 #define LeTh 274
+#define LeEq 275
 /* ----------------------------types--------------------------------------------*/
 /* biliste de quadruplets etiquetes (stocke C3A ou Y86 )*/
 typedef struct cellquad{

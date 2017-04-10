@@ -88,16 +88,16 @@ test: exAnalyseSem
 		./exAnalyseSem < $$test 2>&1 | tee $$test.sem;\
 	done
 
-testC3A: exCompPP
+testC3A: compPP
 	for test in $(TEST); do \
 		echo "\n=====================================\nFichier :" $$test "\n"; \
-                ./exCompPP < $$test | tee $$test.c3a;\
+                ./compPP < $$test | tee $$test.c3a;\
         done
 
-test-run: ppascal
+test-run: interPP
 	for test in $(TEST); do \
 		echo "\n=====================================\nFichier :" $$test "\n"; \
-                ./ppascal < $$test 2>&1 | tee $$test.run;\
+                ./interPP < $$test 2>&1 | tee $$test.run;\
         done
 
 clean:

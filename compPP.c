@@ -234,8 +234,16 @@ int ex_bis(argType *glob,symbolTag* table,symbolTag* local,nodeType* node) {
                 snprintf(buf,20,"CT%d",++currentC);
                 print(current++,"Af",buf,"RETFUN","");
                 break;
+            case Le:
+                ex_bis(glob,table,local,opL);
+                leftCurrent = currentC;
+                ex_bis(glob,table,local,opR);
+                snprintf(buf,20,"CT%d",leftCurrent);
+                snprintf(buf2,20,"CT%d",currentC);
+                snprintf(buf3,20,"CT%d",++currentC);
+                print(current++,"Le",buf,buf2,buf3);
+                break;
             case Lt:
-            case Lo:
                 ex_bis(glob,table,local,opL);
                 leftCurrent = currentC;
                 ex_bis(glob,table,local,opR);

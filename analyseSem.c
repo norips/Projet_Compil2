@@ -78,7 +78,7 @@ typeStruct* analyseSem(symbolTag *glob,symbolTag *loc,nodeType* C) {
 					
 					return typeL;
 					break;
-				case Lo:
+				case Le:
 				case Lt:
 				case Eq:
 					typeL = analyseSem(glob,loc,C->opr.op[0]);

@@ -11,6 +11,19 @@
 
 #define YYDEBUG 1
 
+/*
+
+DRUON DOMENGER JOURDE
+
+Question 1: ppascal.y
+La fonction appelé a comme prototype ex(argType *glob,symbolTag* table,nodeType* C) et est implémenté dans les fichier ci dessous.
+Question 2: analyseSem.c 
+Question 3: eval_program.c 
+Question 4: compPP.c
+Question 5: interC3A.l fonction rec(ENV *env,ENV *loc,ENV *envParam,QUAD elem)
+Question 6: compPPY86.c 
+Question 7: utils/heap.c
+*/
 symbolTag* h_table = NULL;
 
 
@@ -34,9 +47,9 @@ extern void ex(argType *glob,symbolTag* table,nodeType* C);
 %type<id> D_entf D_entp 
 
 %token T_ar NewAr T_boo T_int Def Dep Af true false Sk Se If Th El Var Wh Do
-%token Eq Lt Lo
+%token Eq Lt Le
 %token Not And Or Pl Mo Mu
-%nonassoc Eq Lt Lo
+%nonassoc Eq Lt Le
 %left Or And                    
 %left Pl Mo                    
 %left Mu
@@ -53,7 +66,7 @@ E : E Pl E                    {$$ = opr(line,Pl,2,$1, $3);}
   | E Mo E                    {$$ = opr(line,Mo,2,$1, $3);}
   | E Or E                    {$$ = opr(line,Or,2,$1, $3);}
   | E Lt E                    {$$ = opr(line,Lt,2,$1, $3);}
-  | E Lo E                    {$$ = opr(line,Lo,2,$1, $3);}
+  | E Le E                    {$$ = opr(line,Le,2,$1, $3);}
   | E Eq E                    {$$ = opr(line,Eq,2,$1, $3);}
   | E And E                   {$$ = opr(line,And,2,$1, $3);}
   | E Mu E                    {$$ = opr(line,Mu,2,$1, $3);}

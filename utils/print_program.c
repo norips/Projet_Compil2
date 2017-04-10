@@ -160,7 +160,7 @@ void printNode(nodeType * node, int indentation)
             printf(")");
             break;
             
-         case Lt:
+         case Le:
             printf("(");
             printNode(opL, indentation);
             printf(" <= ");
@@ -168,7 +168,7 @@ void printNode(nodeType * node, int indentation)
             printf(")");
             break;
 
-         case Lo:
+         case Lt:
             printf("(");
             printNode(opL, indentation);
             printf(" < ");

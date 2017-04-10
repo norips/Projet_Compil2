@@ -107,7 +107,7 @@ Variable evalNode(nodeType * node, Env * global, Stack * stack, Heap * heap, sym
             return scalar(left.scalar || right.scalar);
          }
             
-         case Lt:
+         case Le:
          {
             Variable left  = evalNode(opL, global, stack, heap, functions, tempRoots);
             Variable right = evalNode(opR, global, stack, heap, functions, tempRoots);
@@ -116,7 +116,7 @@ Variable evalNode(nodeType * node, Env * global, Stack * stack, Heap * heap, sym
             return scalar(left.scalar <= right.scalar);
          }
 
-         case Lo:
+         case Lt:
          {
             Variable left  = evalNode(opL, global, stack, heap, functions, tempRoots);
             Variable right = evalNode(opR, global, stack, heap, functions, tempRoots);
