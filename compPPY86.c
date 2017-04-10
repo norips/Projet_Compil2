@@ -282,7 +282,8 @@ int ex_bis(symbolTag *glob,symbolTag *loc,nodeType* node) {
                 print(current++,"call","LOWER",NULL);
                 print(current++,"iaddl","8","%esp"); //empty stack
                 break;
-
+            case Sk:
+                break;
             default:
                 fprintf(stderr, KRED "Unimplemented operator type %s\n" KNRM,get_opr(node->opr.oper));
                 

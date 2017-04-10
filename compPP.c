@@ -225,7 +225,7 @@ int ex_bis(argType *glob,symbolTag* table,symbolTag* local,nodeType* node) {
                 }
                 argType *loc = fun->_fun.local;
                 while(loc != NULL) {
-                    print(current++,"Param",loc->name,"0","");
+                    print(current++,"Param",loc->name,"ZEROCONSTANT","");
                     loc = loc->next;
                     i++;
                 }
@@ -273,6 +273,7 @@ void ex(argType *glob,symbolTag* table,nodeType* p) {
     symbolTag *s,*tmp;
     print(current++,"Afc", "0", NULL, "TAS");
     print(current++,"Afc", "0", NULL, "RETFUN");
+    print(current++,"Afc", "0", NULL, "ZEROCONSTANT");
 
     argType* varGlob = glob;
     while(varGlob != NULL) {
