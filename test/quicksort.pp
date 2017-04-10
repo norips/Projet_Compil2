@@ -6,7 +6,7 @@ var third: integer,
 var fourth: integer,
 var fifth: integer
 
-defun getArray() : array of array of integer
+defun getArray() : array of integer
       var array2d : array of array of integer
 {
         array2d    := new array of array of integer[2];
@@ -27,11 +27,10 @@ defun getArray() : array of array of integer
         array2d[1][4] := 3;
         /* [5, 4, 1, 4, 3] -> [1, 3, 4, 4, 5] */
 
-        getArray := array2d
+        getArray := array2d[0]
 }
 
 defun quicksort(arr : array of integer, low : integer, high : integer) : array of integer
-       var middle : integer,
        var pivot  : integer,
        var temp   : integer,
        var i      : integer,
@@ -39,7 +38,7 @@ defun quicksort(arr : array of integer, low : integer, high : integer) : array o
 {
         if (low < high) then
         {
-                pivot  := arr[0];
+                pivot  := arr[low];
 
                 i := low;
                 j := high;
@@ -57,17 +56,19 @@ defun quicksort(arr : array of integer, low : integer, high : integer) : array o
                                 i := i + 1;
                                 j := j - 1
                         }
+                        else skip
                 };
 
-                if (low  < j) then quicksort(arr, low, j);
-                if (not(high < i) and not(high = i)) then quicksort(arr, i, high)
-        };
+                if (low  < j) then quicksort(arr, low, j) else skip;
+                if (not(high < i) and not(high = i)) then quicksort(arr, i, high) else skip
+        }
+        else skip;
 
         quicksort := arr        
 }
 
 
-result := quicksort(getArray()[0], 0, 4);
+result := quicksort(getArray(), 0, 4);
 
 first  := result[0];
 second := result[1];
